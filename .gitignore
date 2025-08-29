@@ -1,0 +1,9 @@
+ztf_pipeline_output
+tarballs
+__pycache__
+dataset_builder.py.alternative
+train_model.py.alternative
+output_log_1m.txt
+output_log.txt
+temp_2.py
+temp.py
