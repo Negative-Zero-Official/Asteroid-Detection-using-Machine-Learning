@@ -1,5 +1,5 @@
-ztf_pipeline_output
-tarballs
+ztf_pipeline_output/*.parquet
+tarballs/*.tar.gz
 __pycache__
 dataset_builder.py.alternative
 train_model.py.alternative
