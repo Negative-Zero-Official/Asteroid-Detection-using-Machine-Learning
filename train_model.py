@@ -46,6 +46,14 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
     # print("=" * 50)
     # print(y_test)
     
+    # Check for data leakage
+    train_alerts = set(groups.iloc[train_idx])
+    test_alerts = set(groups.iloc[test_idx])
+    common_alerts = train_alerts.intersection(test_alerts)
+    if common_alerts:
+        print(f"WARNING: {len(common_alerts)} alerts appear in both train and test sets!")
+        print("Consider using a different split strategy")
+    
     dtrain = xgb.DMatrix(X_train_s, label=y_train)
     dtest = xgb.DMatrix(X_test_s, label=y_test)
     

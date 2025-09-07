@@ -26,22 +26,22 @@ def extract_features_from_blob(blob, diff_img, sci_img):
     patch_diff = diff_img[y0:y1, x0:x1]
     patch_sci = sci_img[y0:y1, x0:x1]
     
-    total_flux = float(np.sum(patch_sci))
-    peak = float(np.max(patch_sci))
+    # total_flux = float(np.sum(patch_sci))
+    # peak = float(np.max(patch_sci))
     mean_patch = float(np.mean(patch_diff))
     std_patch = float(np.std(patch_diff))
-    snr = (peak - mean_patch) / (std_patch + 1e-8)
+    # snr = (peak - mean_patch) / (std_patch + 1e-8)
     
     feats = {
         "area" : float(blob.area),
         "eccentricity" : float(blob.eccentricity),
         "solidity" : float(blob.solidity),
         "orientation" : float(blob.orientation),
-        "total_flux" : total_flux,
-        "peak_flux" : peak,
+        # "total_flux" : total_flux,
+        # "peak_flux" : peak,
         "mean_diff" : mean_patch,
         "std_diff" : std_patch,
-        "snr" : snr,
+        # "snr" : snr,
     }
     
     small = resize(patch_diff, (32, 32), anti_aliasing=True)

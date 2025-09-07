@@ -26,12 +26,12 @@ def build_dataset_from_alerts(
     for i, a in enumerate(alerts):
         if count >= target_total:
             break
-        print(f"Processing alert {i+1}/{len(alerts)}    (collected {count}/{target_total})")
+        # print(f"Processing alert {i+1}/{len(alerts)}    (collected {count}/{target_total})")
         
         try:
             sci = decode_cutout(a["cutoutScience"])
         except Exception as e:
-            print(f"WARNING: failed to decode science cutout for alert {i+1}: {e}")
+            # print(f"WARNING: failed to decode science cutout for alert {i+1}: {e}")
             continue
         ref = None
         if a.get("cutoutTemplate"):
@@ -40,16 +40,16 @@ def build_dataset_from_alerts(
             except Exception:
                 ref = None
         
-        print("Preprocessing images...")
+        # print("Preprocessing images...")
         sci_proc = preprocess_image(sci)
         ref_proc = preprocess_image(ref) if ref is not None else None
-        print("Computing difference...")
+        # print("Computing difference...")
         diff = compute_difference(sci_proc, ref_proc)
         
         h, w = diff.shape
         cx, cy = w / 2.0, h / 2.0
         
-        print("Detecting blobs...")
+        # print("Detecting blobs...")
         blobs = detect_blobs(diff)
         if blobs:
             best = min(blobs, key=lambda b: (b.centroid[0] - cy)**2 + (b.centroid[1] - cx)**2)
@@ -110,15 +110,15 @@ def build_dataset_from_alerts(
                 if local_max < accept_threshold:
                     sub_sci = sci_proc[y0:y0 + patch_size, x0:x0 + patch_size]
                     feat = {
-                        "area" : np.random.uniform(low=0.0, high=5.0),
+                        "area" : np.random.uniform(low=-0.5, high=0.5),
                         "eccentricity" : np.random.uniform(low=0.0, high=1.0),
                         "solidity" : np.random.uniform(0.6, 1.0),
                         "orientation" : np.random.uniform(-1.57, 1.57),
-                        "total_flux" : float(np.sum(sub_sci)),
-                        "peak_flux" : float(np.max(sub_sci)),
-                        "mean_diff" : float(np.median(sub)),
+                        # "total_flux" : float(np.sum(sub_sci)),
+                        # "peak_flux" : float(np.max(sub_sci)),
+                        "mean_diff" : float(np.mean(sub)),
                         "std_diff" : float(np.std(sub)),
-                        "snr" : np.random.uniform(-0.5, 3.0)
+                        # "snr" : np.random.uniform(-0.5, 3.0)
                     }
                     for k in range(12):
                         feat[f"hog_{k}"] = np.random.uniform(0.0, 0.2)
@@ -145,15 +145,15 @@ def build_dataset_from_alerts(
                     x0, y0, sub = best_candidate
                     sub_sci = sci_proc[y0:y0 + patch_size, x0:x0 + patch_size]
                     feat = {
-                        "area" : np.random.uniform(low=0.0, high=5.0),
+                        "area" : np.random.uniform(low=-1.0, high=1.0),
                         "eccentricity" : np.random.uniform(low=0.0, high=1.0),
                         "solidity" : np.random.uniform(0.6, 1.0),
                         "orientation" : np.random.uniform(-1.57, 1.57),
-                        "total_flux" : float(np.sum(sub_sci)),
-                        "peak_flux" : float(np.max(sub_sci)),
-                        "mean_diff" : float(np.median(sub)),
+                        # "total_flux" : float(np.sum(sub_sci)),
+                        # "peak_flux" : float(np.max(sub_sci)),
+                        "mean_diff" : float(np.mean(sub)),
                         "std_diff" : float(np.std(sub)),
-                        "snr" : np.random.uniform(-0.5, 3.0)
+                        # "snr" : np.random.uniform(-0.5, 3.0)
                     }
                     for k in range(12):
                         feat[f"hog_{k}"] = np.random.uniform(0.0, 0.2)
@@ -167,9 +167,10 @@ def build_dataset_from_alerts(
                     })
                     negs_added += 1
                     count += 1
-                    print(f"WARNING: Used fallback negative patch after {attempts} attempts (alert {i+1})")
+                    # print(f"WARNING: Used fallback negative patch after {attempts} attempts (alert {i+1})")
                 else:
-                    print(f"WARNING: Could not generate any negative patches (alert {i+1})")
+                    # print(f"WARNING: Could not generate any negative patches (alert {i+1})")
+                    pass
         
         if len(features) >= batch_size:
             df_feats = pd.DataFrame(features)
@@ -178,7 +179,7 @@ def build_dataset_from_alerts(
             rows_saved = len(df_combined)
             outpath = os.path.join(output_dir, f"batch_{batch_idx:03d}.parquet")
             df_combined.to_parquet(outpath, index=False)
-            print(f"Completed and saved batch {batch_idx} with {rows_saved} rows to {outpath}")
+            # print(f"Completed and saved batch {batch_idx} with {rows_saved} rows to {outpath}")
             features = []
             meta = []
             batch_idx += 1
