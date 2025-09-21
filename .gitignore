@@ -3,8 +3,5 @@ tarballs/*
 __pycache__
 dataset_builder.py.alternative
 train_model.py.alternative
-output_log_1m.txt
-output_log.txt
-temp_2.py
-temp.py
+debugging
 ztf_pipeline_output/pipeline_output.txt
