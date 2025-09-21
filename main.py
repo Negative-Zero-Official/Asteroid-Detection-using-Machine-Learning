@@ -81,7 +81,7 @@ def main():
 
         display = int(input("Display first 5 positives and negatives for debugging? (0/1): "))
         if display:
-            display_sample_images(alerts)
+            display_sample_images(alerts, patch_size=7)
         
         sys.stdout = f
 

@@ -57,7 +57,7 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
         "verbosity" : 1
     }
     
-    bst = xgb.train(params, dtrain, num_boost_round=200, evals=[(dtest, "test")])
+    bst = xgb.train(params, dtrain, num_boost_round=200, evals=[(dtest, "test")], early_stopping_rounds=10)
     preds = (bst.predict(dtest) >= 0.5).astype(int)
     
     prec, rec, f1, _ = precision_recall_fscore_support(y_test, preds, average="binary", zero_division=0)
