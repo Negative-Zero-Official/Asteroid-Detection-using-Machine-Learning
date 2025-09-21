@@ -13,7 +13,7 @@ def build_dataset_from_alerts(
     n_random_neg_per_alert=1,
     desired_patch_size=32,
     batch_size=200,
-    target_total=50000,
+    target_total=5000000,
     max_attempts=50,
     neg_threshold_sigma=3.0,
     min_distance_from_center=12
