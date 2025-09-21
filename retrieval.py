@@ -1,7 +1,7 @@
 import tarfile
 import fastavro
 import io
-import base64, gzip
+import gzip
 from astropy.io import fits
 import numpy as np
 

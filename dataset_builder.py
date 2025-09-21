@@ -2,6 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 from math import hypot
+from skimage.feature import hog
+from skimage.transform import resize
 from retrieval import decode_cutout
 from preprocessing import preprocess_image, compute_difference, detect_blobs, extract_features_from_blob
 
@@ -72,7 +74,7 @@ def build_dataset_from_alerts(
         accept_threshold = global_med + neg_threshold_sigma * global_std
 
         negs_added = 0
-        for nn in range(n_random_neg_per_alert):
+        for _ in range(n_random_neg_per_alert):
             best_candidate = None
             best_candidate_score = np.inf
             accepted = False
@@ -108,20 +110,18 @@ def build_dataset_from_alerts(
 
                 local_max = np.max(sub)
                 if local_max < accept_threshold:
-                    sub_sci = sci_proc[y0:y0 + patch_size, x0:x0 + patch_size]
                     feat = {
-                        "area" : np.random.uniform(low=-0.5, high=0.5),
-                        "eccentricity" : np.random.uniform(low=0.0, high=1.0),
-                        "solidity" : np.random.uniform(0.6, 1.0),
-                        "orientation" : np.random.uniform(-1.57, 1.57),
-                        # "total_flux" : float(np.sum(sub_sci)),
-                        # "peak_flux" : float(np.max(sub_sci)),
                         "mean_diff" : float(np.mean(sub)),
                         "std_diff" : float(np.std(sub)),
-                        # "snr" : np.random.uniform(-0.5, 3.0)
                     }
+                    
+                    sub_resized = resize(sub, (32, 32), anti_aliasing=True)
+                    hog_vec = hog(sub_resized, orientations=12, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, feature_vector=True)
                     for k in range(12):
-                        feat[f"hog_{k}"] = np.random.uniform(0.0, 0.2)
+                        feat[f"hog_{k}"] = float(hog_vec[k] if k < len(hog_vec) else 0.0)
+                    # for i, feature in enumerate(hog_vec):
+                    #     feat[f"hog_{i}"] = feature
+                    
                     feat["label"] = 0
                     features.append(feat)
                     meta.append({
@@ -143,20 +143,18 @@ def build_dataset_from_alerts(
             if not accepted:
                 if best_candidate is not None:
                     x0, y0, sub = best_candidate
-                    sub_sci = sci_proc[y0:y0 + patch_size, x0:x0 + patch_size]
                     feat = {
-                        "area" : np.random.uniform(low=-1.0, high=1.0),
-                        "eccentricity" : np.random.uniform(low=0.0, high=1.0),
-                        "solidity" : np.random.uniform(0.6, 1.0),
-                        "orientation" : np.random.uniform(-1.57, 1.57),
-                        # "total_flux" : float(np.sum(sub_sci)),
-                        # "peak_flux" : float(np.max(sub_sci)),
                         "mean_diff" : float(np.mean(sub)),
                         "std_diff" : float(np.std(sub)),
-                        # "snr" : np.random.uniform(-0.5, 3.0)
                     }
+                    
+                    sub_resized = resize(sub, (32, 32), anti_aliasing=True)
+                    hog_vec = hog(sub_resized, orientations=12, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, feature_vector=True)
                     for k in range(12):
-                        feat[f"hog_{k}"] = np.random.uniform(0.0, 0.2)
+                        feat[f"hog_{k}"] = float(hog_vec[k] if k < len(hog_vec) else 0.0)
+                    # for i, feature in enumerate(hog_vec):
+                    #     feat[f"hog_{i}"] = feature
+                    
                     feat["label"] = 0
                     features.append(feat)
                     meta.append({

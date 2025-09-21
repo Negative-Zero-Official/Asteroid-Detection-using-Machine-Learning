@@ -24,29 +24,20 @@ def detect_blobs(diff_img, threshold_sigma=5.0):
 def extract_features_from_blob(blob, diff_img, sci_img):
     y0, x0, y1, x1 = blob.bbox
     patch_diff = diff_img[y0:y1, x0:x1]
-    patch_sci = sci_img[y0:y1, x0:x1]
     
-    # total_flux = float(np.sum(patch_sci))
-    # peak = float(np.max(patch_sci))
     mean_patch = float(np.mean(patch_diff))
     std_patch = float(np.std(patch_diff))
-    # snr = (peak - mean_patch) / (std_patch + 1e-8)
     
     feats = {
-        "area" : float(blob.area),
-        "eccentricity" : float(blob.eccentricity),
-        "solidity" : float(blob.solidity),
-        "orientation" : float(blob.orientation),
-        # "total_flux" : total_flux,
-        # "peak_flux" : peak,
         "mean_diff" : mean_patch,
         "std_diff" : std_patch,
-        # "snr" : snr,
     }
     
     small = resize(patch_diff, (32, 32), anti_aliasing=True)
     hog_vec = hog(small, orientations=12, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, feature_vector=True)
     for i in range(12):
         feats[f"hog_{i}"] = float(hog_vec[i] if i < len(hog_vec) else 0.0)
+    # for i, feat in enumerate(hog_vec):
+    #     feats[f"hog_{i}"] = feat
     
     return feats
