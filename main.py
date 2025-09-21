@@ -71,12 +71,13 @@ def main():
 
         tar_paths = [
             "tarballs\\ztf_public_20250819.tar.gz",
-            "tarballs\\ztf_public_20250302.tar.gz"
+            "tarballs\\ztf_public_20250302.tar.gz",
+            "tarballs\\ztf_public_20250920.tar.gz"
         ]
 
         alerts = []
         for tar in tar_paths:
-            alerts.extend(parse_avro_alerts_from_tar(tar_path=tar, max_alerts=1000000))
+            alerts.extend(parse_avro_alerts_from_tar(tar_path=tar, max_alerts=100000))
         print(f"Loaded {len(alerts)} alerts.")
 
         display = int(input("Display first 5 positives and negatives for debugging? (0/1): "))
@@ -86,7 +87,7 @@ def main():
         sys.stdout = f
 
         print("Starting dataset building...")
-        build_dataset_from_alerts(alerts, output_dir="ztf_pipeline_output", desired_patch_size=7, batch_size=200, target_total=50000)
+        build_dataset_from_alerts(alerts, output_dir="ztf_pipeline_output", desired_patch_size=7, batch_size=200, target_total=500000)
 
         print("Loading all batches...")
         df = load_all_batches("ztf_pipeline_output")

@@ -5,7 +5,7 @@ import gzip
 from astropy.io import fits
 import numpy as np
 
-def parse_avro_alerts_from_tar(tar_path, max_alerts=None):
+def parse_avro_alerts_from_tar(tar_path, max_alerts):
     alerts = []
     print(f"Processing tar file: {tar_path}")
     with tarfile.open(tar_path, "r:*") as tar:
