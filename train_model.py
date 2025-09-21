@@ -37,14 +37,6 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
     X_train_s = scaler.fit_transform(X_train)
     X_test_s = scaler.transform(X_test)
     
-    # Debugging Print Statements
-    # print(X_train)
-    # print("=" * 50)
-    # print(X_test)
-    # print("=" * 50)
-    # print(y_train)
-    # print("=" * 50)
-    # print(y_test)
     
     # Check for data leakage
     train_alerts = set(groups.iloc[train_idx])
