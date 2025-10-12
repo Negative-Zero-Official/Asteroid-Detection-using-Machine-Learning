@@ -1,11 +1,102 @@
 import os
-import numpy as np
+from pyspark.sql import SparkSession, functions as F, types as T
+from pyspark.sql.udf import udf
 import pandas as pd
-from math import hypot
-from skimage.feature import hog
-from skimage.transform import resize
-from retrieval import decode_cutout
-from preprocessing import preprocess_image, compute_difference, detect_blobs, extract_features_from_blob
+from preprocessing import (
+    preprocess_image_udf, 
+    compute_difference_udf, 
+    extract_features_udf, 
+    extract_negative_features_udf
+)
+
+def build_dataset_from_alerts_spark(
+    alerts_df,
+    output_dir="ztf_pipeline_output_spark",
+    n_random_neg_per_alert=1,
+    desired_patch_size=32,
+    target_total=5000000,
+    neg_threshold_sigma=3.0,
+    min_distance_from_center=12
+):
+    """
+    Build dataset using PySpark for distributed processing
+    """
+    print("Starting Spark dataset building...")
+    
+    # Apply preprocessing pipeline
+    processed_df = alerts_df \
+        .withColumn("sci_proc", preprocess_image_udf(F.col("science_array"))) \
+        .withColumn("ref_proc", preprocess_image_udf(F.col("template_array"))) \
+        .withColumn("diff", compute_difference_udf(F.col("sci_proc"), F.col("ref_proc")))
+    
+    print("Preprocessing completed")
+    
+    # Extract positive features (from blobs)
+    positive_df = processed_df \
+        .withColumn("positive_features", extract_features_udf(F.col("diff"), F.col("sci_proc"))) \
+        .filter(F.col("positive_features").isNotNull()) \
+        .select(
+            F.col("ra"),
+            F.col("dec"), 
+            F.col("jd"),
+            F.col("positive_features.*")
+        )
+    
+    positive_count = positive_df.count()
+    print(f"Extracted {positive_count} positive samples")
+    
+    # Extract negative features
+    negative_df = processed_df \
+        .withColumn(
+            "negative_features", 
+            extract_negative_features_udf(
+                F.col("diff"),
+                F.lit(desired_patch_size),
+                F.lit(neg_threshold_sigma),
+                F.lit(min_distance_from_center)
+            )
+        ) \
+        .filter(F.col("negative_features").isNotNull()) \
+        .select(
+            F.col("ra"),
+            F.col("dec"),
+            F.col("jd"), 
+            F.col("negative_features.*")
+        )
+    
+    # Sample negatives if we have too many
+    if positive_count > 0:
+        # Calculate how many negatives we need to reach target_total with balanced classes
+        negatives_needed = min(target_total - positive_count, positive_count * n_random_neg_per_alert)
+        
+        if negatives_needed > 0:
+            negative_count = negative_df.count()
+            fraction = min(1.0, negatives_needed / negative_count) if negative_count > 0 else 0
+            
+            if fraction > 0:
+                negative_df = negative_df.sample(withReplacement=False, fraction=fraction)
+            else:
+                negative_df = negative_df.limit(negatives_needed)
+    
+    negative_count = negative_df.count()
+    print(f"Extracted {negative_count} negative samples")
+    
+    # Combine positive and negative samples
+    final_dataset = positive_df.union(negative_df)
+    
+    total_count = final_dataset.count()
+    print(f"Final dataset size: {total_count} samples")
+    
+    # Write to parquet with multiple partitions for better parallelism
+    final_dataset.repartition(max(1, total_count // 10000)) \
+        .write \
+        .mode("overwrite") \
+        .option("maxRecordsPerFile", 10000) \
+        .parquet(output_dir)
+    
+    print(f"Dataset complete: {total_count} samples saved in {output_dir}")
+    
+    return final_dataset
 
 def build_dataset_from_alerts(
     alerts,
@@ -18,177 +109,27 @@ def build_dataset_from_alerts(
     neg_threshold_sigma=3.0,
     min_distance_from_center=12
 ):
-    os.makedirs(output_dir, exist_ok=True)
-    features = []
-    meta = []
-    count = 0
-    batch_idx = 0
+    """
+    Legacy function for backward compatibility
+    """
+    print("WARNING: Using legacy single-node dataset builder. Consider using Spark version.")
     
-    print("Starting dataset building...")
-    for i, a in enumerate(alerts):
-        if count >= target_total:
-            break
-        # print(f"Processing alert {i+1}/{len(alerts)}    (collected {count}/{target_total})")
-        
-        try:
-            sci = decode_cutout(a["cutoutScience"])
-        except Exception as e:
-            # print(f"WARNING: failed to decode science cutout for alert {i+1}: {e}")
-            continue
-        ref = None
-        if a.get("cutoutTemplate"):
-            try:
-                ref = decode_cutout(a["cutoutTemplate"])
-            except Exception:
-                ref = None
-        
-        # print("Preprocessing images...")
-        sci_proc = preprocess_image(sci)
-        ref_proc = preprocess_image(ref) if ref is not None else None
-        # print("Computing difference...")
-        diff = compute_difference(sci_proc, ref_proc)
-        
-        h, w = diff.shape
-        cx, cy = w / 2.0, h / 2.0
-        
-        # print("Detecting blobs...")
-        blobs = detect_blobs(diff)
-        if blobs:
-            best = min(blobs, key=lambda b: (b.centroid[0] - cy)**2 + (b.centroid[1] - cx)**2)
-            feat = extract_features_from_blob(best, diff, sci_proc)
-            feat["label"] = 1
-            features.append(feat)
-            meta.append({
-                "ra" : a.get("ra"),
-                "dec" : a.get("dec"),
-                "jd" : a.get("jd"),
-                "alert_id" : i
-            })
-            count += 1
-        
-        patch_size = min(desired_patch_size, h, w)
-        allow_full_stamp = (h == patch_size and w == patch_size)
-        
-        global_med = np.median(diff)
-        global_std = np.std(diff)
-        accept_threshold = global_med + neg_threshold_sigma * global_std
-
-        negs_added = 0
-        for _ in range(n_random_neg_per_alert):
-            best_candidate = None
-            best_candidate_score = np.inf
-            accepted = False
-            attempts = 0
-            
-            while attempts < max_attempts and not accepted:
-                attempts += 1
-                if allow_full_stamp:
-                    x0, y0 = 0, 0
-                else:
-                    max_x = max(0, w - patch_size)
-                    max_y = max(0, h - patch_size)
-                    if max_x == 0 and max_y == 0:
-                        x0, y0 = 0, 0
-                    else:
-                        x0 = np.random.randint(0, max_x + 1) if max_x > 0 else 0
-                        y0 = np.random.randint(0, max_y + 1) if max_y > 0 else 0
-                
-                sub = diff[y0:y0 + patch_size, x0:x0 + patch_size]
-                if sub.size == 0:
-                    continue
-                
-                px_cx = x0 + patch_size / 2.0
-                px_cy = y0 + patch_size / 2.0
-                dist_to_center = hypot(px_cx - cx, px_cy - cy)
-                
-                if dist_to_center < min_distance_from_center:
-                    score = np.max(sub)
-                    if score < best_candidate_score:
-                        best_candidate_score = score
-                        best_candidate = (x0, y0, sub.copy())
-                    continue
-
-                local_max = np.max(sub)
-                if local_max < accept_threshold:
-                    feat = {
-                        "mean_diff" : float(np.mean(sub)),
-                        "std_diff" : float(np.std(sub)),
-                    }
-                    
-                    sub_resized = resize(sub, (32, 32), anti_aliasing=True)
-                    hog_vec = hog(sub_resized, orientations=12, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, feature_vector=True)
-                    for k in range(12):
-                        feat[f"hog_{k}"] = float(hog_vec[k] if k < len(hog_vec) else 0.0)
-                    # for i, feature in enumerate(hog_vec):
-                    #     feat[f"hog_{i}"] = feature
-                    
-                    feat["label"] = 0
-                    features.append(feat)
-                    meta.append({
-                        "ra" : None,
-                        "dec" : None,
-                        "jd" : a.get("jd"),
-                        "alert_id" : i
-                    })
-                    negs_added += 1
-                    count += 1
-                    accepted = True
-                    break
-
-                else:
-                    if local_max < best_candidate_score:
-                        best_candidate_score = local_max
-                        best_candidate = (x0, y0, sub.copy())
-            
-            if not accepted:
-                if best_candidate is not None:
-                    x0, y0, sub = best_candidate
-                    feat = {
-                        "mean_diff" : float(np.mean(sub)),
-                        "std_diff" : float(np.std(sub)),
-                    }
-                    
-                    sub_resized = resize(sub, (32, 32), anti_aliasing=True)
-                    hog_vec = hog(sub_resized, orientations=12, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, feature_vector=True)
-                    for k in range(12):
-                        feat[f"hog_{k}"] = float(hog_vec[k] if k < len(hog_vec) else 0.0)
-                    # for i, feature in enumerate(hog_vec):
-                    #     feat[f"hog_{i}"] = feature
-                    
-                    feat["label"] = 0
-                    features.append(feat)
-                    meta.append({
-                        "ra" : None,
-                        "dec" : None,
-                        "jd" : a.get("jd"),
-                        "alert_id" : i
-                    })
-                    negs_added += 1
-                    count += 1
-                    # print(f"WARNING: Used fallback negative patch after {attempts} attempts (alert {i+1})")
-                else:
-                    # print(f"WARNING: Could not generate any negative patches (alert {i+1})")
-                    pass
-        
-        if len(features) >= batch_size:
-            df_feats = pd.DataFrame(features)
-            df_meta = pd.DataFrame(meta)
-            df_combined = pd.concat([df_meta.reset_index(drop=True), df_feats.reset_index(drop=True)], axis=1)
-            rows_saved = len(df_combined)
-            outpath = os.path.join(output_dir, f"batch_{batch_idx:03d}.parquet")
-            df_combined.to_parquet(outpath, index=False)
-            # print(f"Completed and saved batch {batch_idx} with {rows_saved} rows to {outpath}")
-            features = []
-            meta = []
-            batch_idx += 1
+    # Convert alerts to Spark DataFrame and use Spark version
+    spark = SparkSession.builder.appName("LegacyDatasetBuilder").getOrCreate()
     
-    if features:
-        df_feats = pd.DataFrame(features)
-        df_meta = pd.DataFrame(meta)
-        df_combined = pd.concat([df_meta.reset_index(drop=True), df_feats.reset_index(drop=True)], axis=1)
-        rows_saved = len(df_combined)
-        outpath = os.path.join(output_dir, f"batch_{batch_idx:03d}.parquet")
-        df_combined.to_parquet(outpath, index=False)
-        print(f"Completed and saved FINAL batch {batch_idx} with {rows_saved} rows to {outpath}")
-    
-    print(f"Dataset complete: {count} samples saved in {output_dir}")
+    try:
+        # Convert alerts to Spark DataFrame
+        alerts_df = spark.createDataFrame(alerts)
+        
+        # Use Spark version
+        return build_dataset_from_alerts_spark(
+            alerts_df,
+            output_dir=output_dir,
+            n_random_neg_per_alert=n_random_neg_per_alert,
+            desired_patch_size=desired_patch_size,
+            target_total=target_total,
+            neg_threshold_sigma=neg_threshold_sigma,
+            min_distance_from_center=min_distance_from_center
+        )
+    finally:
+        spark.stop()
