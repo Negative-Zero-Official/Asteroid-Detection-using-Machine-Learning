@@ -1,5 +1,5 @@
 from pyspark.sql import functions as F, types as T
-from pyspark.sql.udf import udf
+from pyspark.sql.functions import udf
 import numpy as np
 from scipy.ndimage import median_filter
 from skimage.feature import hog

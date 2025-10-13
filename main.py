@@ -103,9 +103,7 @@ def main():
     
     with open("output_log.txt", "w") as f:
         tar_paths = [
-            "tarballs/ztf_public_20250819.tar.gz",
-            "tarballs/ztf_public_20250302.tar.gz",
-            "tarballs/ztf_public_20250920.tar.gz"
+            "C:\\Users\\pgait\\Documents\\Coding Projects and Repos\\Asteroid Detection\\tarballs\\ztf_public_20250819.tar.gz"
         ]
 
         print("Loading alerts with Spark...")

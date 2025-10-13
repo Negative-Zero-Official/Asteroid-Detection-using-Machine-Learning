@@ -1,6 +1,5 @@
 import os
-from pyspark.sql import SparkSession, functions as F, types as T
-from pyspark.sql.udf import udf
+from pyspark.sql import SparkSession, functions as F, types as T, udf
 import pandas as pd
 from preprocessing import (
     preprocess_image_udf, 

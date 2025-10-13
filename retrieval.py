@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, functions as F, types as T
-from pyspark.sql.udf import udf
+from pyspark.sql.functions import udf
 import tarfile
 import fastavro
 import io
