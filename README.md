@@ -55,7 +55,7 @@ ZTF Tarballs -> Alert Parsing -> Image Preprocessing -> Difference Imaging -> Bl
 ### Training Results
 The model achieves excellent performance on the test set:
 
-```bash
+```plaintext
 Precision: 0.988 Recall: 0.991 F1: 0.990
 Accuracy: 99% on 103,619 test samples
 ```
