@@ -1,0 +1,215 @@
+Processing tar file: tarballs\ztf_public_20250819.tar.gz
+Loaded 9773 from tarballs\ztf_public_20250819.tar.gz.
+Starting dataset building... (000)
+Completed and saved FINAL batch 77 with 193 rows to ztf_pipeline_output_single\batches\batch_077.parquet
+Dataset complete: 15620 samples saved in ztf_pipeline_output_single\batches
+Processing tar file: tarballs\ztf_public_20250302.tar.gz
+Loaded 38368 from tarballs\ztf_public_20250302.tar.gz.
+Starting dataset building... (078)
+Completed and saved FINAL batch 384 with 119 rows to ztf_pipeline_output_single\batches\batch_384.parquet
+Dataset complete: 61446 samples saved in ztf_pipeline_output_single\batches
+Processing tar file: tarballs\ztf_public_20250920.tar.gz
+Loaded 299009 from tarballs\ztf_public_20250920.tar.gz.
+Starting dataset building... (385)
+Completed and saved FINAL batch 2586 with 50 rows to ztf_pipeline_output_single\batches\batch_2586.parquet
+Dataset complete: 441218 samples saved in ztf_pipeline_output_single\batches
+Loading all batches...
+Total dataset size: 518284 samples.
+Starting training...
+[0]	test-logloss:0.45016
+[1]	test-logloss:0.32062
+[2]	test-logloss:0.23945
+[3]	test-logloss:0.18541
+[4]	test-logloss:0.14773
+[5]	test-logloss:0.12089
+[6]	test-logloss:0.10197
+[7]	test-logloss:0.08806
+[8]	test-logloss:0.07801
+[9]	test-logloss:0.06996
+[10]	test-logloss:0.06409
+[11]	test-logloss:0.05987
+[12]	test-logloss:0.05668
+[13]	test-logloss:0.05433
+[14]	test-logloss:0.05266
+[15]	test-logloss:0.05080
+[16]	test-logloss:0.04892
+[17]	test-logloss:0.04734
+[18]	test-logloss:0.04672
+[19]	test-logloss:0.04587
+[20]	test-logloss:0.04493
+[21]	test-logloss:0.04389
+[22]	test-logloss:0.04303
+[23]	test-logloss:0.04200
+[24]	test-logloss:0.04094
+[25]	test-logloss:0.04034
+[26]	test-logloss:0.03934
+[27]	test-logloss:0.03907
+[28]	test-logloss:0.03854
+[29]	test-logloss:0.03845
+[30]	test-logloss:0.03772
+[31]	test-logloss:0.03706
+[32]	test-logloss:0.03664
+[33]	test-logloss:0.03591
+[34]	test-logloss:0.03573
+[35]	test-logloss:0.03533
+[36]	test-logloss:0.03507
+[37]	test-logloss:0.03500
+[38]	test-logloss:0.03440
+[39]	test-logloss:0.03434
+[40]	test-logloss:0.03392
+[41]	test-logloss:0.03356
+[42]	test-logloss:0.03339
+[43]	test-logloss:0.03291
+[44]	test-logloss:0.03264
+[45]	test-logloss:0.03254
+[46]	test-logloss:0.03252
+[47]	test-logloss:0.03223
+[48]	test-logloss:0.03199
+[49]	test-logloss:0.03169
+[50]	test-logloss:0.03128
+[51]	test-logloss:0.03113
+[52]	test-logloss:0.03088
+[53]	test-logloss:0.03082
+[54]	test-logloss:0.03066
+[55]	test-logloss:0.03063
+[56]	test-logloss:0.03055
+[57]	test-logloss:0.03042
+[58]	test-logloss:0.03030
+[59]	test-logloss:0.03025
+[60]	test-logloss:0.03006
+[61]	test-logloss:0.02984
+[62]	test-logloss:0.02966
+[63]	test-logloss:0.02965
+[64]	test-logloss:0.02964
+[65]	test-logloss:0.02952
+[66]	test-logloss:0.02940
+[67]	test-logloss:0.02916
+[68]	test-logloss:0.02907
+[69]	test-logloss:0.02902
+[70]	test-logloss:0.02899
+[71]	test-logloss:0.02881
+[72]	test-logloss:0.02877
+[73]	test-logloss:0.02872
+[74]	test-logloss:0.02864
+[75]	test-logloss:0.02863
+[76]	test-logloss:0.02850
+[77]	test-logloss:0.02840
+[78]	test-logloss:0.02835
+[79]	test-logloss:0.02822
+[80]	test-logloss:0.02811
+[81]	test-logloss:0.02791
+[82]	test-logloss:0.02786
+[83]	test-logloss:0.02780
+[84]	test-logloss:0.02771
+[85]	test-logloss:0.02765
+[86]	test-logloss:0.02759
+[87]	test-logloss:0.02757
+[88]	test-logloss:0.02755
+[89]	test-logloss:0.02749
+[90]	test-logloss:0.02743
+[91]	test-logloss:0.02742
+[92]	test-logloss:0.02733
+[93]	test-logloss:0.02726
+[94]	test-logloss:0.02726
+[95]	test-logloss:0.02719
+[96]	test-logloss:0.02714
+[97]	test-logloss:0.02703
+[98]	test-logloss:0.02700
+[99]	test-logloss:0.02700
+[100]	test-logloss:0.02699
+[101]	test-logloss:0.02698
+[102]	test-logloss:0.02693
+[103]	test-logloss:0.02693
+[104]	test-logloss:0.02688
+[105]	test-logloss:0.02688
+[106]	test-logloss:0.02688
+[107]	test-logloss:0.02688
+[108]	test-logloss:0.02685
+[109]	test-logloss:0.02686
+[110]	test-logloss:0.02681
+[111]	test-logloss:0.02680
+[112]	test-logloss:0.02676
+[113]	test-logloss:0.02674
+[114]	test-logloss:0.02674
+[115]	test-logloss:0.02666
+[116]	test-logloss:0.02660
+[117]	test-logloss:0.02657
+[118]	test-logloss:0.02655
+[119]	test-logloss:0.02654
+[120]	test-logloss:0.02652
+[121]	test-logloss:0.02647
+[122]	test-logloss:0.02645
+[123]	test-logloss:0.02639
+[124]	test-logloss:0.02637
+[125]	test-logloss:0.02637
+[126]	test-logloss:0.02636
+[127]	test-logloss:0.02635
+[128]	test-logloss:0.02631
+[129]	test-logloss:0.02629
+[130]	test-logloss:0.02630
+[131]	test-logloss:0.02629
+[132]	test-logloss:0.02626
+[133]	test-logloss:0.02619
+[134]	test-logloss:0.02617
+[135]	test-logloss:0.02617
+[136]	test-logloss:0.02612
+[137]	test-logloss:0.02612
+[138]	test-logloss:0.02613
+[139]	test-logloss:0.02612
+[140]	test-logloss:0.02609
+[141]	test-logloss:0.02608
+[142]	test-logloss:0.02608
+[143]	test-logloss:0.02610
+[144]	test-logloss:0.02606
+[145]	test-logloss:0.02603
+[146]	test-logloss:0.02598
+[147]	test-logloss:0.02595
+[148]	test-logloss:0.02599
+[149]	test-logloss:0.02598
+[150]	test-logloss:0.02591
+[151]	test-logloss:0.02590
+[152]	test-logloss:0.02587
+[153]	test-logloss:0.02587
+[154]	test-logloss:0.02587
+[155]	test-logloss:0.02582
+[156]	test-logloss:0.02582
+[157]	test-logloss:0.02577
+[158]	test-logloss:0.02581
+[159]	test-logloss:0.02578
+[160]	test-logloss:0.02578
+[161]	test-logloss:0.02578
+[162]	test-logloss:0.02579
+[163]	test-logloss:0.02581
+[164]	test-logloss:0.02576
+[165]	test-logloss:0.02577
+[166]	test-logloss:0.02577
+[167]	test-logloss:0.02575
+[168]	test-logloss:0.02575
+[169]	test-logloss:0.02573
+[170]	test-logloss:0.02573
+[171]	test-logloss:0.02569
+[172]	test-logloss:0.02571
+[173]	test-logloss:0.02568
+[174]	test-logloss:0.02567
+[175]	test-logloss:0.02569
+[176]	test-logloss:0.02571
+[177]	test-logloss:0.02574
+[178]	test-logloss:0.02572
+[179]	test-logloss:0.02574
+[180]	test-logloss:0.02573
+[181]	test-logloss:0.02575
+[182]	test-logloss:0.02575
+[183]	test-logloss:0.02573
+[184]	test-logloss:0.02574
+Precision:  0.9874165996566188 Recall:  0.990149500937105 F1:  0.9887811619277685
+              precision    recall  f1-score   support
+
+           0       0.99      0.99      0.99     57316
+           1       0.99      0.99      0.99     45886
+
+    accuracy                           0.99    103202
+   macro avg       0.99      0.99      0.99    103202
+weighted avg       0.99      0.99      0.99    103202
+
+Saved Confusion Matrix image.
+Model, scaler, and test results saved.

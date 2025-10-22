@@ -16,15 +16,15 @@ def build_dataset_from_alerts(
     target_total=5000000,
     max_attempts=50,
     neg_threshold_sigma=3.0,
-    min_distance_from_center=12
+    min_distance_from_center=12,
+    batch_idx=0
 ):
     os.makedirs(output_dir, exist_ok=True)
     features = []
     meta = []
     count = 0
-    batch_idx = 0
     
-    print("Starting dataset building...")
+    print(f"Starting dataset building... ({batch_idx:03d})")
     for i, a in enumerate(alerts):
         if count >= target_total:
             break
@@ -192,3 +192,4 @@ def build_dataset_from_alerts(
         print(f"Completed and saved FINAL batch {batch_idx} with {rows_saved} rows to {outpath}")
     
     print(f"Dataset complete: {count} samples saved in {output_dir}")
+    return batch_idx + 1

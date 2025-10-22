@@ -77,3 +77,87 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
     pd.DataFrame(X_test_s, columns=X.columns).assign(label=y_test.values, pred=preds).to_csv(os.path.join(output_dir, "test_results.csv"))
     
     print("Model, scaler, and test results saved.")
+
+class TransientDetector:
+    def __init__(self):
+        self.X_train = None
+        self.y_train = None
+        self.X_test = None
+        self.y_test = None
+        self.scaler = StandardScaler()
+        self.model = None
+
+    def fit(self, df_train):
+        X = df_train.drop(columns=['ra', 'dec', 'jd', 'label', 'alert_id'])
+
+        self.X_train = self.scaler.fit_transform(X)
+        self.y_train = df_train['label'].astype(int)
+        
+        dtrain = xgb.DMatrix(self.X_train, label=self.y_train)
+        
+        params = {
+            "objective" : "binary:logistic",
+            "eval_metric" : "logloss",
+            "tree_method" : "hist",
+            "device" : "cuda",
+            "verbosity" : 1
+        }
+        
+        self.model = xgb.train(params, dtrain, num_boost_round=200)
+        print("Model training complete.")
+
+    def predict(self, df_test):
+        X = df_test.drop(columns=['ra', 'dec', 'jd', 'label', 'alert_id'])
+        
+        self.X_test = self.scaler.transform(X)
+        self.y_test = df_test['label'].astype(int)
+        
+        dtest = xgb.DMatrix(self.X_test, label=self.y_test)
+        pred_probs = self.model.predict(dtest)
+        preds = (pred_probs >= 0.5).astype(int)
+        print("Predictions complete.")
+        
+        return preds, pred_probs
+    
+    def evaluate(self, df_test, preds=None, output_dir='ztf_pipeline_output'):
+        os.makedirs(output_dir, exist_ok=True)
+        
+        y_test = df_test['label'].astype(int)
+        
+        prec, rec, f1, support = precision_recall_fscore_support(y_test, preds, average="binary", zero_division=0)
+        print(f"Precision: {prec}\tRecall: {rec}\tF1 Score: {f1}\tSupport: {support}")
+        print(classification_report(y_test, preds))
+        
+        cm = confusion_matrix(y_test, preds)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Non-Asteroid', 'Asteroid'])
+        disp.plot(cmap='Blues', values_format='d')
+        plt.title('Asteroid Detection Confusion Matrix')
+        plt.savefig(os.path.join(output_dir, "confusion_matrix.jpg"))
+        print("Saved Confusion Matrix image.")
+        plt.close()
+    
+    def save_model(self, output_dir='ztf_pipeline_output'):
+        os.makedirs(output_dir, exist_ok=True)
+        
+        self.model.save_model(os.path.join(output_dir, 'xgb_model.json'))
+        joblib.dump(self.scaler, os.path.join(output_dir, 'scaler.pkl'))
+        print("Model and scaler saved.")
+    
+    def save_predictions(self, df_test, pred_probs, preds, output_dir='ztf_pipeline_output'):
+        os.makedirs(output_dir, exist_ok=True)
+        
+        X = df_test.drop(columns=['ra', 'dec', 'jd', 'label', 'alert_id'])
+        results_df = pd.DataFrame(self.X_test, columns=X.columns).assign(
+            label=self.y_test.values,
+            pred_prob=pred_probs,
+            pred=preds
+        )
+        results_df.to_csv(os.path.join(output_dir, 'test_results.csv'))
+        print("Test results saved.")
+    
+    def run_all(self, df_train, df_test, output_dir='ztf_pipeline_output'):
+        self.fit(df_train)
+        preds, pred_probs = self.predict(df_test)
+        self.evaluate(df_test, preds, output_dir)
+        self.save_model(output_dir)
+        self.save_predictions(df_test, pred_probs, preds, output_dir)

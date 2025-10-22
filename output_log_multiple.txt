@@ -1,0 +1,46 @@
+Processing tar file: tarballs\ztf_public_20250920.tar.gz
+Loaded 299009 from tarballs\ztf_public_20250920.tar.gz (training).
+Starting dataset building... (000)
+Completed and saved FINAL batch 2201 with 50 rows to ztf_pipeline_output_multiple\batches\train\batch_2201.parquet
+Dataset complete: 441218 samples saved in ztf_pipeline_output_multiple\batches\train
+Loading training batches...
+Total training dataset size: 441218 samples.
+Index(['ra', 'dec', 'jd', 'alert_id', 'mean_diff', 'std_diff', 'hog_0',
+       'hog_1', 'hog_2', 'hog_3', 'hog_4', 'hog_5', 'hog_6', 'hog_7', 'hog_8',
+       'hog_9', 'hog_10', 'hog_11', 'label'],
+      dtype='object')
+Processing tar file: tarballs\ztf_public_20250302.tar.gz
+Loaded 38368 from tarballs\ztf_public_20250302.tar.gz (testing).
+Starting dataset building... (000)
+Completed and saved FINAL batch 306 with 119 rows to ztf_pipeline_output_multiple\batches\test\batch_306.parquet
+Dataset complete: 61446 samples saved in ztf_pipeline_output_multiple\batches\test
+Processing tar file: tarballs\ztf_public_20250819.tar.gz
+Loaded 9773 from tarballs\ztf_public_20250819.tar.gz (testing).
+Starting dataset building... (307)
+Completed and saved FINAL batch 384 with 193 rows to ztf_pipeline_output_multiple\batches\test\batch_384.parquet
+Dataset complete: 15620 samples saved in ztf_pipeline_output_multiple\batches\test
+Loading testing batches...
+Total testing dataset size: 77066 samples.
+Index(['ra', 'dec', 'jd', 'alert_id', 'mean_diff', 'std_diff', 'hog_0',
+       'hog_1', 'hog_2', 'hog_3', 'hog_4', 'hog_5', 'hog_6', 'hog_7', 'hog_8',
+       'hog_9', 'hog_10', 'hog_11', 'label'],
+      dtype='object')
+Spawning Transient Detector model and fitting data...
+Model training complete.
+Running predictions on test data...
+Predictions complete.
+Evaluating performance...
+Precision: 0.9898550724637681	Recall: 0.981701586599591	F1 Score: 0.9857614699270032	Support: None
+              precision    recall  f1-score   support
+
+           0       0.98      0.99      0.99     40888
+           1       0.99      0.98      0.99     36178
+
+    accuracy                           0.99     77066
+   macro avg       0.99      0.99      0.99     77066
+weighted avg       0.99      0.99      0.99     77066
+
+Saved Confusion Matrix image.
+Saving model and predictions...
+Model and scaler saved.
+Test results saved.

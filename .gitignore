@@ -1,8 +1,7 @@
-ztf_pipeline_output/*.parquet
+ztf_pipeline_output_single/batches
+ztf_pipeline_output_multiple/batches
 tarballs/*
 __pycache__
-dataset_builder.py.alternative
-train_model.py.alternative
 debugging
-ztf_pipeline_output/pipeline_output.txt
 .github
+ztf_pipeline_output_old

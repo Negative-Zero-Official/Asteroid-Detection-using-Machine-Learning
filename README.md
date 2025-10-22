@@ -1,3 +1,6 @@
+> [!WARNING]
+> This README is outdated as of the latest commit. WIP to update the README
+
 # ZTF Asteroid Detection Pipeline
 
 A machine learning pipeline for detecting asteroids in Zwicky Transient Facility (ZTF) alert data using feature extraction and XGBoost classification.
