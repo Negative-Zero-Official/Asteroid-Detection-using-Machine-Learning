@@ -4,12 +4,17 @@ import io
 import gzip
 from astropy.io import fits
 import numpy as np
+from tqdm import tqdm
+import warnings
+import sys
+
+warnings.filterwarnings('ignore')
 
 def parse_avro_alerts_from_tar(tar_path, max_alerts):
     alerts = []
     print(f"Processing tar file: {tar_path}")
     with tarfile.open(tar_path, "r:*") as tar:
-        for member in tar.getmembers():
+        for member in tqdm(tar.getmembers(), desc=f"Parsing AVRO alerts ({tar_path})", file=sys.stderr):
             if not member.isfile() or not member.name.endswith(".avro"):
                 continue
             f = tar.extractfile(member)

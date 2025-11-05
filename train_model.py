@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
+from tqdm import tqdm
+import sys
 from sklearn.model_selection import GroupShuffleSplit
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import precision_recall_fscore_support, classification_report, confusion_matrix, ConfusionMatrixDisplay
@@ -13,11 +15,11 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)  # Auto-detect terminal width
 pd.set_option('display.max_colwidth', None)  # Show full column content
 
-def load_all_batches(output_dir="ztf_pipeline_output"):
+def load_all_batches(input_dir="ztf_pipeline_output"):
     dfs = []
-    for f in sorted(os.listdir(output_dir)):
+    for f in tqdm(sorted(os.listdir(input_dir)), desc="Loading Batches", file=sys.stderr):
         if f.startswith("batch_") and f.endswith(".parquet"):
-            dfs.append(pd.read_parquet(os.path.join(output_dir, f)))
+            dfs.append(pd.read_parquet(os.path.join(input_dir, f)))
     
     return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
 

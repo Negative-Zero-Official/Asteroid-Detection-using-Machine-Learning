@@ -5,42 +5,77 @@ Completed and saved FINAL batch 2201 with 50 rows to ztf_pipeline_output_multipl
 Dataset complete: 441218 samples saved in ztf_pipeline_output_multiple\batches\train
 Loading training batches...
 Total training dataset size: 441218 samples.
-Index(['ra', 'dec', 'jd', 'alert_id', 'mean_diff', 'std_diff', 'hog_0',
-       'hog_1', 'hog_2', 'hog_3', 'hog_4', 'hog_5', 'hog_6', 'hog_7', 'hog_8',
-       'hog_9', 'hog_10', 'hog_11', 'label'],
-      dtype='object')
+Spawning Transient Detector model and fitting data...
+Model training complete.
 Processing tar file: tarballs\ztf_public_20250302.tar.gz
 Loaded 38368 from tarballs\ztf_public_20250302.tar.gz (testing).
 Starting dataset building... (000)
-Completed and saved FINAL batch 306 with 119 rows to ztf_pipeline_output_multiple\batches\test\batch_306.parquet
-Dataset complete: 61446 samples saved in ztf_pipeline_output_multiple\batches\test
+Completed and saved FINAL batch 306 with 119 rows to ztf_pipeline_output_multiple\batches\test_0\batch_306.parquet
+Dataset complete: 61446 samples saved in ztf_pipeline_output_multiple\batches\test_0
 Processing tar file: tarballs\ztf_public_20250819.tar.gz
 Loaded 9773 from tarballs\ztf_public_20250819.tar.gz (testing).
-Starting dataset building... (307)
-Completed and saved FINAL batch 384 with 193 rows to ztf_pipeline_output_multiple\batches\test\batch_384.parquet
-Dataset complete: 15620 samples saved in ztf_pipeline_output_multiple\batches\test
-Loading testing batches...
-Total testing dataset size: 77066 samples.
-Index(['ra', 'dec', 'jd', 'alert_id', 'mean_diff', 'std_diff', 'hog_0',
-       'hog_1', 'hog_2', 'hog_3', 'hog_4', 'hog_5', 'hog_6', 'hog_7', 'hog_8',
-       'hog_9', 'hog_10', 'hog_11', 'label'],
-      dtype='object')
-Spawning Transient Detector model and fitting data...
-Model training complete.
-Running predictions on test data...
+Starting dataset building... (000)
+Completed and saved FINAL batch 77 with 193 rows to ztf_pipeline_output_multiple\batches\test_1\batch_077.parquet
+Dataset complete: 15620 samples saved in ztf_pipeline_output_multiple\batches\test_1
+Processing tar file: tarballs\ztf_public_20251102.tar.gz
+Loaded 177421 from tarballs\ztf_public_20251102.tar.gz (testing).
+Starting dataset building... (000)
+Completed and saved FINAL batch 1300 with 121 rows to ztf_pipeline_output_multiple\batches\test_2\batch_1300.parquet
+Dataset complete: 260718 samples saved in ztf_pipeline_output_multiple\batches\test_2
+Testing each training dataset separately...
+Loading dataset for TAR tarballs\ztf_public_20250302.tar.gz...
+Test dataset size for tarballs\ztf_public_20250302.tar.gz: 61446 samples.
+Running predictions for TAR tarballs\ztf_public_20250302.tar.gz...
 Predictions complete.
-Evaluating performance...
-Precision: 0.9898550724637681	Recall: 0.981701586599591	F1 Score: 0.9857614699270032	Support: None
+Evaluating model for TAR tarballs\ztf_public_20250302.tar.gz...
+Precision: 0.9891923825410064	Recall: 0.9778762582019307	F1 Score: 0.9835017707523538	Support: None
               precision    recall  f1-score   support
 
-           0       0.98      0.99      0.99     40888
-           1       0.99      0.98      0.99     36178
+           0       0.98      0.99      0.99     32337
+           1       0.99      0.98      0.98     29109
 
-    accuracy                           0.99     77066
-   macro avg       0.99      0.99      0.99     77066
-weighted avg       0.99      0.99      0.99     77066
+    accuracy                           0.98     61446
+   macro avg       0.98      0.98      0.98     61446
+weighted avg       0.98      0.98      0.98     61446
 
 Saved Confusion Matrix image.
-Saving model and predictions...
-Model and scaler saved.
+Saving predictions for TAR tarballs\ztf_public_20250302.tar.gz...
 Test results saved.
+Loading dataset for TAR tarballs\ztf_public_20250819.tar.gz...
+Test dataset size for tarballs\ztf_public_20250819.tar.gz: 15620 samples.
+Running predictions for TAR tarballs\ztf_public_20250819.tar.gz...
+Predictions complete.
+Evaluating model for TAR tarballs\ztf_public_20250819.tar.gz...
+Precision: 0.999289570900824	Recall: 0.9949073419154053	F1 Score: 0.997093641454597	Support: None
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      8551
+           1       1.00      0.99      1.00      7069
+
+    accuracy                           1.00     15620
+   macro avg       1.00      1.00      1.00     15620
+weighted avg       1.00      1.00      1.00     15620
+
+Saved Confusion Matrix image.
+Saving predictions for TAR tarballs\ztf_public_20250819.tar.gz...
+Test results saved.
+Loading dataset for TAR tarballs\ztf_public_20251102.tar.gz...
+Test dataset size for tarballs\ztf_public_20251102.tar.gz: 260718 samples.
+Running predictions for TAR tarballs\ztf_public_20251102.tar.gz...
+Predictions complete.
+Evaluating model for TAR tarballs\ztf_public_20251102.tar.gz...
+Precision: 0.9849845377532873	Recall: 0.9925318455875213	F1 Score: 0.9887437892978059	Support: None
+              precision    recall  f1-score   support
+
+           0       0.99      0.99      0.99    147437
+           1       0.98      0.99      0.99    113281
+
+    accuracy                           0.99    260718
+   macro avg       0.99      0.99      0.99    260718
+weighted avg       0.99      0.99      0.99    260718
+
+Saved Confusion Matrix image.
+Saving predictions for TAR tarballs\ztf_public_20251102.tar.gz...
+Test results saved.
+Saving model...
+Model and scaler saved.

@@ -1,6 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
+import sys
 from math import hypot
 from skimage.feature import hog
 from skimage.transform import resize
@@ -25,15 +27,13 @@ def build_dataset_from_alerts(
     count = 0
     
     print(f"Starting dataset building... ({batch_idx:03d})")
-    for i, a in enumerate(alerts):
+    for i, a in enumerate(tqdm(alerts, desc="Dataset building", file=sys.stderr)):
         if count >= target_total:
             break
-        # print(f"Processing alert {i+1}/{len(alerts)}    (collected {count}/{target_total})")
         
         try:
             sci = decode_cutout(a["cutoutScience"])
         except Exception as e:
-            # print(f"WARNING: failed to decode science cutout for alert {i+1}: {e}")
             continue
         ref = None
         if a.get("cutoutTemplate"):
@@ -42,16 +42,13 @@ def build_dataset_from_alerts(
             except Exception:
                 ref = None
         
-        # print("Preprocessing images...")
         sci_proc = preprocess_image(sci)
         ref_proc = preprocess_image(ref) if ref is not None else None
-        # print("Computing difference...")
         diff = compute_difference(sci_proc, ref_proc)
         
         h, w = diff.shape
         cx, cy = w / 2.0, h / 2.0
         
-        # print("Detecting blobs...")
         blobs = detect_blobs(diff)
         if blobs:
             best = min(blobs, key=lambda b: (b.centroid[0] - cy)**2 + (b.centroid[1] - cx)**2)
@@ -165,9 +162,7 @@ def build_dataset_from_alerts(
                     })
                     negs_added += 1
                     count += 1
-                    # print(f"WARNING: Used fallback negative patch after {attempts} attempts (alert {i+1})")
                 else:
-                    # print(f"WARNING: Could not generate any negative patches (alert {i+1})")
                     pass
         
         if len(features) >= batch_size:
@@ -177,7 +172,6 @@ def build_dataset_from_alerts(
             rows_saved = len(df_combined)
             outpath = os.path.join(output_dir, f"batch_{batch_idx:03d}.parquet")
             df_combined.to_parquet(outpath, index=False)
-            # print(f"Completed and saved batch {batch_idx} with {rows_saved} rows to {outpath}")
             features = []
             meta = []
             batch_idx += 1

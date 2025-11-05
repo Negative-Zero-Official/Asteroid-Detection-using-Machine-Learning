@@ -14,7 +14,8 @@ def main():
         tar_paths = [
             "tarballs\\ztf_public_20250819.tar.gz",
             "tarballs\\ztf_public_20250302.tar.gz",
-            "tarballs\\ztf_public_20250920.tar.gz"
+            "tarballs\\ztf_public_20250920.tar.gz",
+            "tarballs\\ztf_public_20251102.tar.gz"
         ]
 
         batch_idx = 0
