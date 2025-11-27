@@ -42,9 +42,12 @@ def build_dataset_from_alerts(
             except Exception:
                 ref = None
         
-        sci_proc = preprocess_image(sci)
-        ref_proc = preprocess_image(ref) if ref is not None else None
-        diff = compute_difference(sci_proc, ref_proc)
+        # sci_proc = preprocess_image(sci)
+        # ref_proc = preprocess_image(ref) if ref is not None else None
+        # diff = compute_difference(sci_proc, ref_proc)
+        sci_proc = sci
+        ref_proc = ref if ref is not None else None
+        diff = decode_cutout(a["cutoutDifference"])
         
         h, w = diff.shape
         cx, cy = w / 2.0, h / 2.0

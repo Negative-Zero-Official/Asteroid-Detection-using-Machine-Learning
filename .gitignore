@@ -1,6 +1,5 @@
 ztf_pipeline_output_single/batches
 ztf_pipeline_output_multiple/batches
-ztf_pipeline_output_multiple/eval_test_*
 tarballs/*
 __pycache__
 debugging
