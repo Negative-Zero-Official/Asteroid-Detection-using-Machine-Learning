@@ -77,7 +77,7 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
     print(classification_report(y_test, preds))
     
     cm = confusion_matrix(y_test, preds)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0, 1])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Bogus', 'Real'])
     disp.plot(cmap="Blues", values_format="d")
     plt.title("Asteroid Detection Confusion Matrix")
     plt.savefig(os.path.join(output_dir, "confusion_matrix.jpg"))
@@ -148,7 +148,7 @@ class TransientDetector:
         print(classification_report(y_test, preds))
         
         cm = confusion_matrix(y_test, preds)
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Non-Asteroid', 'Asteroid'])
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Bogus', 'Real'])
         disp.plot(cmap='Blues', values_format='d')
         plt.title('Asteroid Detection Confusion Matrix')
         plt.savefig(os.path.join(output_dir, "confusion_matrix.jpg"))

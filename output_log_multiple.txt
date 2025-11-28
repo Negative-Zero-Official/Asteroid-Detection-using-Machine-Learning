@@ -1,0 +1,81 @@
+Processing tar file: tarballs\ztf_public_20250920.tar.gz
+Loaded 299009 from tarballs\ztf_public_20250920.tar.gz (training).
+Starting dataset building... (000)
+Completed and saved FINAL batch 1487 to ztf_pipeline_output_multiple\batches\train\batch_1487.parquet
+Dataset complete: 299009 samples saved in ztf_pipeline_output_multiple\batches\train
+Loading training batches...
+Total training dataset size: 299009 samples.
+Spawning Transient Detector model and fitting data...
+Model training complete.
+Processing tar file: tarballs\ztf_public_20250302.tar.gz
+Loaded 38368 from tarballs\ztf_public_20250302.tar.gz (testing).
+Starting dataset building... (000)
+Completed and saved FINAL batch 190 to ztf_pipeline_output_multiple\batches\test_0\batch_190.parquet
+Dataset complete: 38368 samples saved in ztf_pipeline_output_multiple\batches\test_0
+Processing tar file: tarballs\ztf_public_20250819.tar.gz
+Loaded 9773 from tarballs\ztf_public_20250819.tar.gz (testing).
+Starting dataset building... (000)
+Completed and saved FINAL batch 48 to ztf_pipeline_output_multiple\batches\test_1\batch_048.parquet
+Dataset complete: 9773 samples saved in ztf_pipeline_output_multiple\batches\test_1
+Processing tar file: tarballs\ztf_public_20251102.tar.gz
+Loaded 177421 from tarballs\ztf_public_20251102.tar.gz (testing).
+Starting dataset building... (000)
+Completed and saved FINAL batch 882 to ztf_pipeline_output_multiple\batches\test_2\batch_882.parquet
+Dataset complete: 177421 samples saved in ztf_pipeline_output_multiple\batches\test_2
+Testing each training dataset separately...
+Loading dataset for TAR tarballs\ztf_public_20250302.tar.gz...
+Test dataset size for tarballs\ztf_public_20250302.tar.gz: 38368 samples.
+Running predictions for TAR tarballs\ztf_public_20250302.tar.gz...
+Predictions complete.
+Evaluating model for TAR tarballs\ztf_public_20250302.tar.gz...
+Precision: 0.9423617448439496	Recall: 0.9051576031695944	F1 Score: 0.9233850776164246	Support: None
+              precision    recall  f1-score   support
+
+           0       0.75      0.84      0.79      9847
+           1       0.94      0.91      0.92     28521
+
+    accuracy                           0.89     38368
+   macro avg       0.85      0.87      0.86     38368
+weighted avg       0.89      0.89      0.89     38368
+
+Saved Confusion Matrix image.
+Saving predictions for TAR tarballs\ztf_public_20250302.tar.gz...
+Test results saved.
+Loading dataset for TAR tarballs\ztf_public_20250819.tar.gz...
+Test dataset size for tarballs\ztf_public_20250819.tar.gz: 9773 samples.
+Running predictions for TAR tarballs\ztf_public_20250819.tar.gz...
+Predictions complete.
+Evaluating model for TAR tarballs\ztf_public_20250819.tar.gz...
+Precision: 0.9474946695095949	Recall: 0.9110712455151204	F1 Score: 0.9289260517376535	Support: None
+              precision    recall  f1-score   support
+
+           0       0.69      0.80      0.74      1969
+           1       0.95      0.91      0.93      7804
+
+    accuracy                           0.89      9773
+   macro avg       0.82      0.86      0.84      9773
+weighted avg       0.90      0.89      0.89      9773
+
+Saved Confusion Matrix image.
+Saving predictions for TAR tarballs\ztf_public_20250819.tar.gz...
+Test results saved.
+Loading dataset for TAR tarballs\ztf_public_20251102.tar.gz...
+Test dataset size for tarballs\ztf_public_20251102.tar.gz: 177421 samples.
+Running predictions for TAR tarballs\ztf_public_20251102.tar.gz...
+Predictions complete.
+Evaluating model for TAR tarballs\ztf_public_20251102.tar.gz...
+Precision: 0.9374433290155441	Recall: 0.8914216648575409	F1 Score: 0.9138534510313041	Support: None
+              precision    recall  f1-score   support
+
+           0       0.74      0.84      0.78     47524
+           1       0.94      0.89      0.91    129897
+
+    accuracy                           0.88    177421
+   macro avg       0.84      0.86      0.85    177421
+weighted avg       0.88      0.88      0.88    177421
+
+Saved Confusion Matrix image.
+Saving predictions for TAR tarballs\ztf_public_20251102.tar.gz...
+Test results saved.
+Saving model...
+Model and scaler saved.
