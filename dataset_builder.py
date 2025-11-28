@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import sys
-from skimage.feature import hog
-from skimage.transform import resize
 from astropy.stats import sigma_clipped_stats
 from retrieval import decode_cutout
 
@@ -41,13 +39,9 @@ def extract_features_from_image(image, img_type='sci'):
     feats = {
         img_type + '_mean' : float(np.mean(norm)),
         img_type + '_std' : float(np.std(norm)),
-        img_type + '_max' : float(np.max(norm))
+        img_type + '_max' : float(np.max(norm)),
+        img_type + '_min' : float(np.min(norm))
     }
-    
-    resized = resize(norm, (63, 63), anti_aliasing=True)
-    hog_vec = hog(resized, orientations=12, pixels_per_cell=(8, 8), cells_per_block=(1, 1), feature_vector=True)
-    for i, feat in enumerate(hog_vec):
-        feats[img_type + f"_hog_{i}"] = feat
     
     return feats
 

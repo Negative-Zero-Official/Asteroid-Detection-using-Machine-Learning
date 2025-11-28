@@ -1,4 +1,4 @@
-ztf_pipeline_output_single/batches
+ztf_pipeline_output_single/*
 ztf_pipeline_output_multiple/*
 tarballs/*
 __pycache__
