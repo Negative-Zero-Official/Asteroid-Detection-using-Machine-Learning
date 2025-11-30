@@ -1,6 +1,7 @@
 from retrieval import parse_avro_alerts_from_tar
 from dataset_builder import build_dataset_from_alerts
 from train_model import load_all_batches, TransientDetector
+from preprocessing import display_sample_images
 import sys
 import gc
 
@@ -19,7 +20,9 @@ def main():
             alerts = []
             alerts.extend(parse_avro_alerts_from_tar(tar_path=tar, max_alerts=400000))
             print(f"Loaded {len(alerts)} from {tar} (training).")
-            batch_idx = build_dataset_from_alerts(alerts, output_dir='ztf_pipeline_output_multiple\\batches\\train', batch_size=200, target_total=600000, batch_idx=batch_idx)
+            if batch_idx == 0:
+                display_sample_images(alerts, num_samples=5, patch_size=7, output_dir='ztf_pipeline_output_multiple')
+            batch_idx = build_dataset_from_alerts(alerts, output_dir='ztf_pipeline_output_multiple\\batches\\train', desired_patch_size=7, batch_size=200, target_total=600000, batch_idx=batch_idx)
             del alerts
             gc.collect()
         
@@ -42,7 +45,7 @@ def main():
                 alerts = []
                 alerts.extend(parse_avro_alerts_from_tar(tar_path=tar, max_alerts=400000))
                 print(f"Loaded {len(alerts)} from {tar} (testing).")
-                batch_idx = build_dataset_from_alerts(alerts, output_dir=f'ztf_pipeline_output_multiple\\batches\\test_{i}', batch_size=200, target_total=600000, batch_idx=0)
+                batch_idx = build_dataset_from_alerts(alerts, output_dir=f'ztf_pipeline_output_multiple\\batches\\test_{i}', desired_patch_size=7, batch_size=200, target_total=600000, batch_idx=0)
                 del alerts
                 gc.collect()
             
@@ -71,7 +74,7 @@ def main():
                 alerts = []
                 alerts.extend(parse_avro_alerts_from_tar(tar_path=tar, max_alerts=400000))
                 print(f"Loaded {len(alerts)} from {tar} (testing).")
-                batch_idx = build_dataset_from_alerts(alerts, output_dir='ztf_pipeline_output_multiple\\batches\\test', batch_size=200, target_total=600000, batch_idx=batch_idx)
+                batch_idx = build_dataset_from_alerts(alerts, output_dir='ztf_pipeline_output_multiple\\batches\\test', desired_patch_size=7, batch_size=200, target_total=600000, batch_idx=batch_idx)
                 del alerts
                 gc.collect()
             

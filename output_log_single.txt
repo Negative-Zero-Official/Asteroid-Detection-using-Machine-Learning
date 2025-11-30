@@ -1,238 +1,133 @@
 Processing tar file: tarballs\ztf_public_20250819.tar.gz
 Loaded 9773 from tarballs\ztf_public_20250819.tar.gz.
 Starting dataset building... (000)
-Completed and saved FINAL batch 48 to ztf_pipeline_output_single\batches\batch_048.parquet
-Dataset complete: 9773 samples saved in ztf_pipeline_output_single\batches
+Completed and saved FINAL batch 89 with 93 rows to ztf_pipeline_output_single\batches\batch_089.parquet
+Dataset complete: 17938 samples saved in ztf_pipeline_output_single\batches
 Processing tar file: tarballs\ztf_public_20250302.tar.gz
 Loaded 38368 from tarballs\ztf_public_20250302.tar.gz.
-Starting dataset building... (049)
-Completed and saved FINAL batch 239 to ztf_pipeline_output_single\batches\batch_239.parquet
-Dataset complete: 38368 samples saved in ztf_pipeline_output_single\batches
+Starting dataset building... (090)
+Completed and saved FINAL batch 416 with 84 rows to ztf_pipeline_output_single\batches\batch_416.parquet
+Dataset complete: 65405 samples saved in ztf_pipeline_output_single\batches
 Processing tar file: tarballs\ztf_public_20250920.tar.gz
 Loaded 299009 from tarballs\ztf_public_20250920.tar.gz.
-Starting dataset building... (240)
-Completed and saved FINAL batch 1727 to ztf_pipeline_output_single\batches\batch_1727.parquet
-Dataset complete: 299009 samples saved in ztf_pipeline_output_single\batches
+Starting dataset building... (417)
+Completed and saved FINAL batch 3032 with 175 rows to ztf_pipeline_output_single\batches\batch_3032.parquet
+Dataset complete: 524343 samples saved in ztf_pipeline_output_single\batches
 Processing tar file: tarballs\ztf_public_20251102.tar.gz
 Loaded 177421 from tarballs\ztf_public_20251102.tar.gz.
-Starting dataset building... (1728)
-Completed and saved FINAL batch 2610 to ztf_pipeline_output_single\batches\batch_2610.parquet
-Dataset complete: 177421 samples saved in ztf_pipeline_output_single\batches
+Starting dataset building... (3033)
+Completed and saved FINAL batch 4563 with 1 rows to ztf_pipeline_output_single\batches\batch_4563.parquet
+Dataset complete: 306659 samples saved in ztf_pipeline_output_single\batches
 Loading all batches...
-Total dataset size: 524571 samples.
+Total dataset size: 914345 samples.
 Starting training...
-Started model training at: 2025-11-30 18:09:26
-[0]	test-logloss:0.56581	test-aucpr:0.95658
-[1]	test-logloss:0.49066	test-aucpr:0.96265
-[2]	test-logloss:0.44396	test-aucpr:0.96475
-[3]	test-logloss:0.41298	test-aucpr:0.96609
-[4]	test-logloss:0.38939	test-aucpr:0.96759
-[5]	test-logloss:0.37238	test-aucpr:0.96870
-[6]	test-logloss:0.35847	test-aucpr:0.97005
-[7]	test-logloss:0.34827	test-aucpr:0.97114
-[8]	test-logloss:0.33928	test-aucpr:0.97198
-[9]	test-logloss:0.33346	test-aucpr:0.97254
-[10]	test-logloss:0.32840	test-aucpr:0.97299
-[11]	test-logloss:0.32467	test-aucpr:0.97343
-[12]	test-logloss:0.32216	test-aucpr:0.97375
-[13]	test-logloss:0.31992	test-aucpr:0.97403
-[14]	test-logloss:0.31743	test-aucpr:0.97447
-[15]	test-logloss:0.31552	test-aucpr:0.97464
-[16]	test-logloss:0.31395	test-aucpr:0.97481
-[17]	test-logloss:0.31221	test-aucpr:0.97512
-[18]	test-logloss:0.31089	test-aucpr:0.97527
-[19]	test-logloss:0.30919	test-aucpr:0.97555
-[20]	test-logloss:0.30765	test-aucpr:0.97576
-[21]	test-logloss:0.30679	test-aucpr:0.97594
-[22]	test-logloss:0.30569	test-aucpr:0.97606
-[23]	test-logloss:0.30476	test-aucpr:0.97619
-[24]	test-logloss:0.30396	test-aucpr:0.97627
-[25]	test-logloss:0.30338	test-aucpr:0.97633
-[26]	test-logloss:0.30249	test-aucpr:0.97647
-[27]	test-logloss:0.30169	test-aucpr:0.97657
-[28]	test-logloss:0.30134	test-aucpr:0.97662
-[29]	test-logloss:0.30075	test-aucpr:0.97671
-[30]	test-logloss:0.30020	test-aucpr:0.97679
-[31]	test-logloss:0.29932	test-aucpr:0.97694
-[32]	test-logloss:0.29891	test-aucpr:0.97698
-[33]	test-logloss:0.29843	test-aucpr:0.97705
-[34]	test-logloss:0.29794	test-aucpr:0.97712
-[35]	test-logloss:0.29730	test-aucpr:0.97717
-[36]	test-logloss:0.29683	test-aucpr:0.97724
-[37]	test-logloss:0.29658	test-aucpr:0.97727
-[38]	test-logloss:0.29609	test-aucpr:0.97735
-[39]	test-logloss:0.29569	test-aucpr:0.97738
-[40]	test-logloss:0.29547	test-aucpr:0.97740
-[41]	test-logloss:0.29510	test-aucpr:0.97743
-[42]	test-logloss:0.29506	test-aucpr:0.97744
-[43]	test-logloss:0.29472	test-aucpr:0.97749
-[44]	test-logloss:0.29449	test-aucpr:0.97753
-[45]	test-logloss:0.29422	test-aucpr:0.97757
-[46]	test-logloss:0.29415	test-aucpr:0.97757
-[47]	test-logloss:0.29398	test-aucpr:0.97758
-[48]	test-logloss:0.29388	test-aucpr:0.97760
-[49]	test-logloss:0.29335	test-aucpr:0.97767
-[50]	test-logloss:0.29276	test-aucpr:0.97775
-[51]	test-logloss:0.29249	test-aucpr:0.97779
-[52]	test-logloss:0.29231	test-aucpr:0.97782
-[53]	test-logloss:0.29212	test-aucpr:0.97784
-[54]	test-logloss:0.29160	test-aucpr:0.97790
-[55]	test-logloss:0.29126	test-aucpr:0.97795
-[56]	test-logloss:0.29116	test-aucpr:0.97795
-[57]	test-logloss:0.29087	test-aucpr:0.97800
-[58]	test-logloss:0.29062	test-aucpr:0.97802
-[59]	test-logloss:0.29047	test-aucpr:0.97802
-[60]	test-logloss:0.29025	test-aucpr:0.97804
-[61]	test-logloss:0.28996	test-aucpr:0.97807
-[62]	test-logloss:0.28959	test-aucpr:0.97814
-[63]	test-logloss:0.28932	test-aucpr:0.97817
-[64]	test-logloss:0.28916	test-aucpr:0.97818
-[65]	test-logloss:0.28896	test-aucpr:0.97821
-[66]	test-logloss:0.28886	test-aucpr:0.97822
-[67]	test-logloss:0.28879	test-aucpr:0.97822
-[68]	test-logloss:0.28854	test-aucpr:0.97825
-[69]	test-logloss:0.28804	test-aucpr:0.97831
-[70]	test-logloss:0.28777	test-aucpr:0.97835
-[71]	test-logloss:0.28768	test-aucpr:0.97835
-[72]	test-logloss:0.28746	test-aucpr:0.97838
-[73]	test-logloss:0.28729	test-aucpr:0.97840
-[74]	test-logloss:0.28733	test-aucpr:0.97839
-[75]	test-logloss:0.28716	test-aucpr:0.97841
-[76]	test-logloss:0.28713	test-aucpr:0.97840
-[77]	test-logloss:0.28691	test-aucpr:0.97842
-[78]	test-logloss:0.28669	test-aucpr:0.97845
-[79]	test-logloss:0.28648	test-aucpr:0.97849
-[80]	test-logloss:0.28632	test-aucpr:0.97852
-[81]	test-logloss:0.28607	test-aucpr:0.97854
-[82]	test-logloss:0.28593	test-aucpr:0.97855
-[83]	test-logloss:0.28555	test-aucpr:0.97859
-[84]	test-logloss:0.28534	test-aucpr:0.97862
-[85]	test-logloss:0.28521	test-aucpr:0.97863
-[86]	test-logloss:0.28500	test-aucpr:0.97865
-[87]	test-logloss:0.28497	test-aucpr:0.97865
-[88]	test-logloss:0.28496	test-aucpr:0.97864
-[89]	test-logloss:0.28489	test-aucpr:0.97864
-[90]	test-logloss:0.28477	test-aucpr:0.97866
-[91]	test-logloss:0.28465	test-aucpr:0.97867
-[92]	test-logloss:0.28457	test-aucpr:0.97868
-[93]	test-logloss:0.28443	test-aucpr:0.97871
-[94]	test-logloss:0.28435	test-aucpr:0.97870
-[95]	test-logloss:0.28430	test-aucpr:0.97870
-[96]	test-logloss:0.28408	test-aucpr:0.97872
-[97]	test-logloss:0.28393	test-aucpr:0.97874
-[98]	test-logloss:0.28381	test-aucpr:0.97876
-[99]	test-logloss:0.28374	test-aucpr:0.97877
-[100]	test-logloss:0.28368	test-aucpr:0.97876
-[101]	test-logloss:0.28353	test-aucpr:0.97878
-[102]	test-logloss:0.28342	test-aucpr:0.97878
-[103]	test-logloss:0.28338	test-aucpr:0.97878
-[104]	test-logloss:0.28321	test-aucpr:0.97879
-[105]	test-logloss:0.28320	test-aucpr:0.97879
-[106]	test-logloss:0.28312	test-aucpr:0.97880
-[107]	test-logloss:0.28298	test-aucpr:0.97883
-[108]	test-logloss:0.28278	test-aucpr:0.97885
-[109]	test-logloss:0.28256	test-aucpr:0.97887
-[110]	test-logloss:0.28246	test-aucpr:0.97888
-[111]	test-logloss:0.28240	test-aucpr:0.97889
-[112]	test-logloss:0.28226	test-aucpr:0.97891
-[113]	test-logloss:0.28220	test-aucpr:0.97891
-[114]	test-logloss:0.28201	test-aucpr:0.97893
-[115]	test-logloss:0.28191	test-aucpr:0.97894
-[116]	test-logloss:0.28186	test-aucpr:0.97895
-[117]	test-logloss:0.28176	test-aucpr:0.97896
-[118]	test-logloss:0.28166	test-aucpr:0.97897
-[119]	test-logloss:0.28163	test-aucpr:0.97897
-[120]	test-logloss:0.28158	test-aucpr:0.97897
-[121]	test-logloss:0.28148	test-aucpr:0.97898
-[122]	test-logloss:0.28144	test-aucpr:0.97897
-[123]	test-logloss:0.28137	test-aucpr:0.97898
-[124]	test-logloss:0.28121	test-aucpr:0.97899
-[125]	test-logloss:0.28122	test-aucpr:0.97898
-[126]	test-logloss:0.28122	test-aucpr:0.97898
-[127]	test-logloss:0.28116	test-aucpr:0.97898
-[128]	test-logloss:0.28087	test-aucpr:0.97901
-[129]	test-logloss:0.28075	test-aucpr:0.97904
-[130]	test-logloss:0.28070	test-aucpr:0.97904
-[131]	test-logloss:0.28061	test-aucpr:0.97905
-[132]	test-logloss:0.28061	test-aucpr:0.97904
-[133]	test-logloss:0.28055	test-aucpr:0.97904
-[134]	test-logloss:0.28048	test-aucpr:0.97905
-[135]	test-logloss:0.28039	test-aucpr:0.97906
-[136]	test-logloss:0.28033	test-aucpr:0.97907
-[137]	test-logloss:0.28015	test-aucpr:0.97908
-[138]	test-logloss:0.28017	test-aucpr:0.97907
-[139]	test-logloss:0.28017	test-aucpr:0.97906
-[140]	test-logloss:0.28014	test-aucpr:0.97907
-[141]	test-logloss:0.28001	test-aucpr:0.97909
-[142]	test-logloss:0.27993	test-aucpr:0.97910
-[143]	test-logloss:0.27988	test-aucpr:0.97910
-[144]	test-logloss:0.27987	test-aucpr:0.97910
-[145]	test-logloss:0.27982	test-aucpr:0.97911
-[146]	test-logloss:0.27979	test-aucpr:0.97910
-[147]	test-logloss:0.27974	test-aucpr:0.97910
-[148]	test-logloss:0.27968	test-aucpr:0.97910
-[149]	test-logloss:0.27966	test-aucpr:0.97910
-[150]	test-logloss:0.27959	test-aucpr:0.97910
-[151]	test-logloss:0.27956	test-aucpr:0.97911
-[152]	test-logloss:0.27943	test-aucpr:0.97912
-[153]	test-logloss:0.27929	test-aucpr:0.97914
-[154]	test-logloss:0.27920	test-aucpr:0.97916
-[155]	test-logloss:0.27911	test-aucpr:0.97916
-[156]	test-logloss:0.27911	test-aucpr:0.97915
-[157]	test-logloss:0.27907	test-aucpr:0.97915
-[158]	test-logloss:0.27904	test-aucpr:0.97915
-[159]	test-logloss:0.27900	test-aucpr:0.97915
-[160]	test-logloss:0.27885	test-aucpr:0.97917
-[161]	test-logloss:0.27888	test-aucpr:0.97916
-[162]	test-logloss:0.27871	test-aucpr:0.97918
-[163]	test-logloss:0.27861	test-aucpr:0.97919
-[164]	test-logloss:0.27858	test-aucpr:0.97920
-[165]	test-logloss:0.27852	test-aucpr:0.97921
-[166]	test-logloss:0.27848	test-aucpr:0.97921
-[167]	test-logloss:0.27842	test-aucpr:0.97921
-[168]	test-logloss:0.27842	test-aucpr:0.97921
-[169]	test-logloss:0.27841	test-aucpr:0.97921
-[170]	test-logloss:0.27838	test-aucpr:0.97921
-[171]	test-logloss:0.27835	test-aucpr:0.97921
-[172]	test-logloss:0.27825	test-aucpr:0.97922
-[173]	test-logloss:0.27824	test-aucpr:0.97922
-[174]	test-logloss:0.27823	test-aucpr:0.97922
-[175]	test-logloss:0.27819	test-aucpr:0.97922
-[176]	test-logloss:0.27815	test-aucpr:0.97923
-[177]	test-logloss:0.27806	test-aucpr:0.97924
-[178]	test-logloss:0.27805	test-aucpr:0.97923
-[179]	test-logloss:0.27795	test-aucpr:0.97924
-[180]	test-logloss:0.27791	test-aucpr:0.97925
-[181]	test-logloss:0.27779	test-aucpr:0.97926
-[182]	test-logloss:0.27776	test-aucpr:0.97925
-[183]	test-logloss:0.27772	test-aucpr:0.97925
-[184]	test-logloss:0.27759	test-aucpr:0.97926
-[185]	test-logloss:0.27753	test-aucpr:0.97926
-[186]	test-logloss:0.27737	test-aucpr:0.97928
-[187]	test-logloss:0.27730	test-aucpr:0.97928
-[188]	test-logloss:0.27727	test-aucpr:0.97928
-[189]	test-logloss:0.27722	test-aucpr:0.97928
-[190]	test-logloss:0.27723	test-aucpr:0.97927
-[191]	test-logloss:0.27719	test-aucpr:0.97926
-[192]	test-logloss:0.27712	test-aucpr:0.97926
-[193]	test-logloss:0.27714	test-aucpr:0.97925
-[194]	test-logloss:0.27707	test-aucpr:0.97925
-[195]	test-logloss:0.27704	test-aucpr:0.97926
-[196]	test-logloss:0.27698	test-aucpr:0.97925
-Finished model training at: 2025-11-30 18:09:27
-Model training time: 1.3361220359802246 seconds			(3.1835548099935063e-06 seconds per alert)	(314114.2715246796 alerts per second)
-Started model execution/prediction at: 2025-11-30 18:09:27
-Finished model execution/prediction at: 2025-11-30 18:09:27
-Model execution time: 0.005898237228393555 seconds		(5.624010477510159e-08 seconds per alert)	(17780905.707748897 alerts per second)
-Precision:  0.9447181249023978 Recall:  0.8826650395935854 F1:  0.9126380031543578
+[0]	test-logloss:0.42840
+[1]	test-logloss:0.29119
+[2]	test-logloss:0.20493
+[3]	test-logloss:0.14728
+[4]	test-logloss:0.10738
+[5]	test-logloss:0.07917
+[6]	test-logloss:0.05895
+[7]	test-logloss:0.04432
+[8]	test-logloss:0.03364
+[9]	test-logloss:0.02583
+[10]	test-logloss:0.02011
+[11]	test-logloss:0.01587
+[12]	test-logloss:0.01275
+[13]	test-logloss:0.01041
+[14]	test-logloss:0.00870
+[15]	test-logloss:0.00743
+[16]	test-logloss:0.00647
+[17]	test-logloss:0.00576
+[18]	test-logloss:0.00522
+[19]	test-logloss:0.00481
+[20]	test-logloss:0.00449
+[21]	test-logloss:0.00423
+[22]	test-logloss:0.00404
+[23]	test-logloss:0.00391
+[24]	test-logloss:0.00376
+[25]	test-logloss:0.00363
+[26]	test-logloss:0.00354
+[27]	test-logloss:0.00346
+[28]	test-logloss:0.00343
+[29]	test-logloss:0.00337
+[30]	test-logloss:0.00333
+[31]	test-logloss:0.00329
+[32]	test-logloss:0.00323
+[33]	test-logloss:0.00318
+[34]	test-logloss:0.00314
+[35]	test-logloss:0.00312
+[36]	test-logloss:0.00308
+[37]	test-logloss:0.00305
+[38]	test-logloss:0.00303
+[39]	test-logloss:0.00301
+[40]	test-logloss:0.00300
+[41]	test-logloss:0.00299
+[42]	test-logloss:0.00297
+[43]	test-logloss:0.00296
+[44]	test-logloss:0.00295
+[45]	test-logloss:0.00293
+[46]	test-logloss:0.00290
+[47]	test-logloss:0.00290
+[48]	test-logloss:0.00290
+[49]	test-logloss:0.00289
+[50]	test-logloss:0.00284
+[51]	test-logloss:0.00283
+[52]	test-logloss:0.00281
+[53]	test-logloss:0.00280
+[54]	test-logloss:0.00278
+[55]	test-logloss:0.00276
+[56]	test-logloss:0.00275
+[57]	test-logloss:0.00272
+[58]	test-logloss:0.00272
+[59]	test-logloss:0.00271
+[60]	test-logloss:0.00271
+[61]	test-logloss:0.00270
+[62]	test-logloss:0.00270
+[63]	test-logloss:0.00270
+[64]	test-logloss:0.00270
+[65]	test-logloss:0.00269
+[66]	test-logloss:0.00269
+[67]	test-logloss:0.00269
+[68]	test-logloss:0.00267
+[69]	test-logloss:0.00267
+[70]	test-logloss:0.00267
+[71]	test-logloss:0.00265
+[72]	test-logloss:0.00264
+[73]	test-logloss:0.00263
+[74]	test-logloss:0.00263
+[75]	test-logloss:0.00263
+[76]	test-logloss:0.00261
+[77]	test-logloss:0.00261
+[78]	test-logloss:0.00263
+[79]	test-logloss:0.00262
+[80]	test-logloss:0.00262
+[81]	test-logloss:0.00261
+[82]	test-logloss:0.00260
+[83]	test-logloss:0.00259
+[84]	test-logloss:0.00259
+[85]	test-logloss:0.00258
+[86]	test-logloss:0.00259
+[87]	test-logloss:0.00258
+[88]	test-logloss:0.00258
+[89]	test-logloss:0.00259
+[90]	test-logloss:0.00259
+[91]	test-logloss:0.00260
+[92]	test-logloss:0.00261
+[93]	test-logloss:0.00262
+[94]	test-logloss:0.00262
+[95]	test-logloss:0.00262
+[96]	test-logloss:0.00262
+[97]	test-logloss:0.00262
+Precision:  0.9988306347982524 Recall:  0.9988306347982524 F1:  0.9988306347982524
               precision    recall  f1-score   support
 
-           0       0.74      0.87      0.80     29485
-           1       0.94      0.88      0.91     75391
+           0       1.00      1.00      1.00    104771
+           1       1.00      1.00      1.00     77820
 
-    accuracy                           0.88    104876
-   macro avg       0.84      0.88      0.86    104876
-weighted avg       0.89      0.88      0.88    104876
+    accuracy                           1.00    182591
+   macro avg       1.00      1.00      1.00    182591
+weighted avg       1.00      1.00      1.00    182591
 
 Saved Confusion Matrix image.
 Model, scaler, and test results saved.

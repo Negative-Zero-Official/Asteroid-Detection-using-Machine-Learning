@@ -3,121 +3,190 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import sys
-from astropy.stats import sigma_clipped_stats
+from math import hypot
+from skimage.feature import hog
+from skimage.transform import resize
 from retrieval import decode_cutout
-from feature_extractor import extract_alert_features
-
-def normalize_image(arr, clip_sigma=5.0, to_range=True):
-    finite = arr[np.isfinite(arr)]
-    median_f, max_f, min_f = 0.0, 0.0, 0.0
-    if finite.size:
-        median_f = np.median(finite)
-        max_f = np.max(finite)
-        min_f = np.min(finite)
-    
-    arr = np.nan_to_num(arr, nan=median_f, posinf=max_f, neginf=min_f).astype(np.float32)
-    
-    _, median, std = sigma_clipped_stats(arr, sigma=5.0, maxiters=5)
-    bg = median
-    scale = std if (std is not None and std > 1e-6) else 1.0
-    
-    norm = (arr - bg) / scale
-    norm = np.clip(norm, -clip_sigma, clip_sigma)
-    
-    if to_range:
-        norm = (norm + clip_sigma) / (2 * clip_sigma)
-    
-    return norm
-
-def extract_features_from_image(image, img_type='sci'):
-    if image is None:
-        return None
-    
-    arr = np.asarray(image, dtype=np.float32)
-    
-    norm = normalize_image(arr, clip_sigma=5.0, to_range=True)
-    
-    feats = {
-        img_type + '_mean' : float(np.mean(norm)),
-        img_type + '_std' : float(np.std(norm)),
-        img_type + '_max' : float(np.max(norm)),
-        img_type + '_min' : float(np.min(norm))
-    }
-    
-    return feats
+from preprocessing import preprocess_image, compute_difference, detect_blobs, extract_features_from_blob
 
 def build_dataset_from_alerts(
     alerts,
-    output_dir='ztf_pipeline_output',
+    output_dir="ztf_pipeline_output",
+    n_random_neg_per_alert=1,
+    desired_patch_size=32,
     batch_size=200,
     target_total=5000000,
+    max_attempts=50,
+    neg_threshold_sigma=3.0,
+    min_distance_from_center=12,
     batch_idx=0
 ):
     os.makedirs(output_dir, exist_ok=True)
     features = []
+    meta = []
     count = 0
     
     print(f"Starting dataset building... ({batch_idx:03d})")
-    for i, a in enumerate(tqdm(alerts, desc='Dataset Building', file=sys.stderr)):
+    for i, a in enumerate(tqdm(alerts, desc="Dataset building", file=sys.stderr)):
         if count >= target_total:
             break
-
-        reality_score = a['drb']
-        
-        # if 0.3 <= reality_score <= 0.7:
-        #     continue
         
         try:
-            sci = decode_cutout(a['cutoutScience'])
-        except Exception:
+            sci = decode_cutout(a["cutoutScience"])
+        except Exception as e:
             continue
         ref = None
-        if a.get('cutoutTemplate'):
+        if a.get("cutoutTemplate"):
             try:
-                ref = decode_cutout(a['cutoutTemplate'])
+                ref = decode_cutout(a["cutoutTemplate"])
             except Exception:
                 ref = None
-        try:
-            diff = decode_cutout(a['cutoutDifference'])
-        except Exception:
-            continue
         
-        fwhm_pixels = a['fwhm'] / 1.01
+        # sci_proc = preprocess_image(sci)
+        # ref_proc = preprocess_image(ref) if ref is not None else None
+        # diff = compute_difference(sci_proc, ref_proc)
+        sci_proc = sci
+        ref_proc = ref if ref is not None else None
+        diff = decode_cutout(a["cutoutDifference"])
         
-        alert_feats = extract_alert_features(
-            sci=sci, ref=ref, diff=diff,
-            fwhm_alert=fwhm_pixels
-        )
+        h, w = diff.shape
+        cx, cy = w / 2.0, h / 2.0
         
-        combined_feat = {
-            'alert_id' : i,
-            'magpsf' : a['magpsf'],
-            'sigmapsf' : a['sigmapsf'],
-            'fwhm' : a['fwhm'],
-            'ndethist' : a['ndethist'],
-            'sgscore1' : a['sgscore1'],
-            'sgscore2' : a['sgscore2'],
-            'sgscore3' : a['sgscore3'],
-            'ssdistnr' : a['ssdistnr'],
-            'label' : 1 if reality_score >= 0.85 else 0
-        }
+        blobs = detect_blobs(diff)
+        if blobs:
+            best = min(blobs, key=lambda b: (b.centroid[0] - cy)**2 + (b.centroid[1] - cx)**2)
+            feat = extract_features_from_blob(best, diff, sci_proc)
+            feat["label"] = 1
+            features.append(feat)
+            meta.append({
+                "ra" : a.get("ra"),
+                "dec" : a.get("dec"),
+                "jd" : a.get("jd"),
+                "alert_id" : i
+            })
+            count += 1
         
-        combined_feat.update(alert_feats)
-        features.append(combined_feat)
-        count += 1
+        patch_size = min(desired_patch_size, h, w)
+        allow_full_stamp = (h == patch_size and w == patch_size)
         
-        if len(features) > batch_size:
+        global_med = np.median(diff)
+        global_std = np.std(diff)
+        accept_threshold = global_med + neg_threshold_sigma * global_std
+
+        negs_added = 0
+        for _ in range(n_random_neg_per_alert):
+            best_candidate = None
+            best_candidate_score = np.inf
+            accepted = False
+            attempts = 0
+            
+            while attempts < max_attempts and not accepted:
+                attempts += 1
+                if allow_full_stamp:
+                    x0, y0 = 0, 0
+                else:
+                    max_x = max(0, w - patch_size)
+                    max_y = max(0, h - patch_size)
+                    if max_x == 0 and max_y == 0:
+                        x0, y0 = 0, 0
+                    else:
+                        x0 = np.random.randint(0, max_x + 1) if max_x > 0 else 0
+                        y0 = np.random.randint(0, max_y + 1) if max_y > 0 else 0
+                
+                sub = diff[y0:y0 + patch_size, x0:x0 + patch_size]
+                if sub.size == 0:
+                    continue
+                
+                px_cx = x0 + patch_size / 2.0
+                px_cy = y0 + patch_size / 2.0
+                dist_to_center = hypot(px_cx - cx, px_cy - cy)
+                
+                if dist_to_center < min_distance_from_center:
+                    score = np.max(sub)
+                    if score < best_candidate_score:
+                        best_candidate_score = score
+                        best_candidate = (x0, y0, sub.copy())
+                    continue
+
+                local_max = np.max(sub)
+                if local_max < accept_threshold:
+                    feat = {
+                        "mean_diff" : float(np.mean(sub)),
+                        "std_diff" : float(np.std(sub)),
+                    }
+                    
+                    sub_resized = resize(sub, (32, 32), anti_aliasing=True)
+                    hog_vec = hog(sub_resized, orientations=12, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, feature_vector=True)
+                    for k in range(12):
+                        feat[f"hog_{k}"] = float(hog_vec[k] if k < len(hog_vec) else 0.0)
+                    # for i, feature in enumerate(hog_vec):
+                    #     feat[f"hog_{i}"] = feature
+                    
+                    feat["label"] = 0
+                    features.append(feat)
+                    meta.append({
+                        "ra" : None,
+                        "dec" : None,
+                        "jd" : a.get("jd"),
+                        "alert_id" : i
+                    })
+                    negs_added += 1
+                    count += 1
+                    accepted = True
+                    break
+
+                else:
+                    if local_max < best_candidate_score:
+                        best_candidate_score = local_max
+                        best_candidate = (x0, y0, sub.copy())
+            
+            if not accepted:
+                if best_candidate is not None:
+                    x0, y0, sub = best_candidate
+                    feat = {
+                        "mean_diff" : float(np.mean(sub)),
+                        "std_diff" : float(np.std(sub)),
+                    }
+                    
+                    sub_resized = resize(sub, (32, 32), anti_aliasing=True)
+                    hog_vec = hog(sub_resized, orientations=12, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, feature_vector=True)
+                    for k in range(12):
+                        feat[f"hog_{k}"] = float(hog_vec[k] if k < len(hog_vec) else 0.0)
+                    # for i, feature in enumerate(hog_vec):
+                    #     feat[f"hog_{i}"] = feature
+                    
+                    feat["label"] = 0
+                    features.append(feat)
+                    meta.append({
+                        "ra" : None,
+                        "dec" : None,
+                        "jd" : a.get("jd"),
+                        "alert_id" : i
+                    })
+                    negs_added += 1
+                    count += 1
+                else:
+                    pass
+        
+        if len(features) >= batch_size:
             df_feats = pd.DataFrame(features)
-            outpath = os.path.join(output_dir, f'batch_{batch_idx:03d}.parquet')
-            df_feats.to_parquet(outpath, index=False)
+            df_meta = pd.DataFrame(meta)
+            df_combined = pd.concat([df_meta.reset_index(drop=True), df_feats.reset_index(drop=True)], axis=1)
+            rows_saved = len(df_combined)
+            outpath = os.path.join(output_dir, f"batch_{batch_idx:03d}.parquet")
+            df_combined.to_parquet(outpath, index=False)
             features = []
+            meta = []
             batch_idx += 1
     
     if features:
         df_feats = pd.DataFrame(features)
-        outpath = os.path.join(output_dir, f'batch_{batch_idx:03d}.parquet')
-        df_feats.to_parquet(outpath, index=False)
-        print(f"Completed and saved FINAL batch {batch_idx} to {outpath}")
+        df_meta = pd.DataFrame(meta)
+        df_combined = pd.concat([df_meta.reset_index(drop=True), df_feats.reset_index(drop=True)], axis=1)
+        rows_saved = len(df_combined)
+        outpath = os.path.join(output_dir, f"batch_{batch_idx:03d}.parquet")
+        df_combined.to_parquet(outpath, index=False)
+        print(f"Completed and saved FINAL batch {batch_idx} with {rows_saved} rows to {outpath}")
     
     print(f"Dataset complete: {count} samples saved in {output_dir}")
     return batch_idx + 1

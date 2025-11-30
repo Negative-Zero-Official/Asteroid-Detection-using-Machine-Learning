@@ -4,11 +4,16 @@ import joblib
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import sys
-import time
 from sklearn.model_selection import GroupShuffleSplit
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import precision_recall_fscore_support, classification_report, confusion_matrix, ConfusionMatrixDisplay
 import xgboost as xgb
+
+# Set display options to show all rows/columns
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)  # Auto-detect terminal width
+pd.set_option('display.max_colwidth', None)  # Show full column content
 
 def load_all_batches(input_dir="ztf_pipeline_output"):
     dfs = []
@@ -21,7 +26,7 @@ def load_all_batches(input_dir="ztf_pipeline_output"):
 def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
     os.makedirs(output_dir, exist_ok=True)
     
-    X = df.drop(columns=["label", "alert_id"])
+    X = df.drop(columns=["ra", "dec", "jd", "label", "alert_id"])
     y = df["label"].astype(int)
     groups = df["alert_id"]
     
@@ -34,6 +39,7 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
     X_train_s = scaler.fit_transform(X_train)
     X_test_s = scaler.transform(X_test)
     
+    
     # Check for data leakage
     train_alerts = set(groups.iloc[train_idx])
     test_alerts = set(groups.iloc[test_idx])
@@ -45,50 +51,16 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
     dtrain = xgb.DMatrix(X_train_s, label=y_train)
     dtest = xgb.DMatrix(X_test_s, label=y_test)
     
-    neg_count = (y_train == 0).sum()
-    pos_count = (y_train == 1).sum()
-    scale_pos_weight = neg_count / pos_count if pos_count > 0 else 1.0
-    
     params = {
         "objective" : "binary:logistic",
-        "eval_metric" : ["logloss", "aucpr"],
+        "eval_metric" : "logloss",
         "tree_method" : "hist",
         "device" : "cuda",
-        "verbosity" : 1,
-        "scale_pos_weight" : scale_pos_weight,
-        "max_depth" : 6,
-        "min_child_weight" : 3
+        "verbosity" : 1
     }
     
-    training_start_time = time.time()
-    training_start_lt = time.localtime(training_start_time)
-    training_start_ft = time.strftime("%Y-%m-%d %H:%M:%S", training_start_lt)
-    print(f"Started model training at: {training_start_ft}")
-    
     bst = xgb.train(params, dtrain, num_boost_round=200, evals=[(dtest, "test")], early_stopping_rounds=10)
-    
-    training_end_time = time.time()
-    training_end_lt = time.localtime(training_end_time)
-    training_end_ft = time.strftime("%Y-%m-%d %H:%M:%S", training_end_lt)
-    print(f"Finished model training at: {training_end_ft}")
-    training_time = training_end_time - training_start_time
-    print(f"Model training time: {training_time} seconds\t\t\t({training_time / len(X_train)} seconds per alert)\t({len(X_train) / training_time} alerts per second)")
-    
-    test_start_time = time.time()
-    test_start_lt = time.localtime(test_start_time)
-    test_start_ft = time.strftime("%Y-%m-%d %H:%M:%S", test_start_lt)
-    print(f"Started model execution/prediction at: {test_start_ft}")
-    
-    probs = bst.predict(dtest)
-    
-    test_end_time = time.time()
-    test_end_lt = time.localtime(test_end_time)
-    test_end_ft = time.strftime("%Y-%m-%d %H:%M:%S", test_end_lt)
-    print(f"Finished model execution/prediction at: {test_end_ft}")
-    execution_time = test_end_time - test_start_time
-    print(f"Model execution time: {execution_time} seconds\t\t({execution_time / len(X_test)} seconds per alert)\t({len(X_test) / execution_time} alerts per second)")
-    
-    preds = (probs >= 0.5).astype(int)
+    preds = (bst.predict(dtest) >= 0.5).astype(int)
     
     prec, rec, f1, _ = precision_recall_fscore_support(y_test, preds, average="binary", zero_division=0)
     print("Precision: ", prec, "Recall: ", rec, "F1: ", f1)
@@ -104,7 +76,7 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
     
     bst.save_model(os.path.join(output_dir, "xgb_model.json"))
     joblib.dump(scaler, os.path.join(output_dir, "scaler.pkl"))
-    pd.DataFrame(X_test_s, columns=X.columns).assign(label=y_test.values, pred=preds, pred_prob=probs).to_csv(os.path.join(output_dir, "test_results.csv"))
+    pd.DataFrame(X_test_s, columns=X.columns).assign(label=y_test.values, pred=preds).to_csv(os.path.join(output_dir, "test_results.csv"))
     
     print("Model, scaler, and test results saved.")
 
@@ -118,33 +90,26 @@ class TransientDetector:
         self.model = None
 
     def fit(self, df_train):
-        X = df_train.drop(columns=['label', 'alert_id'])
+        X = df_train.drop(columns=['ra', 'dec', 'jd', 'label', 'alert_id'])
 
         self.X_train = self.scaler.fit_transform(X)
         self.y_train = df_train['label'].astype(int)
         
         dtrain = xgb.DMatrix(self.X_train, label=self.y_train)
         
-        neg_count = (self.y_train == 0).sum()
-        pos_count = (self.y_train == 1).sum()
-        scale_pos_weight = neg_count / pos_count if pos_count > 0 else 1.0
-        
         params = {
             "objective" : "binary:logistic",
             "eval_metric" : "logloss",
             "tree_method" : "hist",
             "device" : "cuda",
-            "verbosity" : 1,
-            "scale_pos_weight" : scale_pos_weight,
-            "max_depth" : 6,
-            "min_child_weight" : 3
+            "verbosity" : 1
         }
         
         self.model = xgb.train(params, dtrain, num_boost_round=200)
         print("Model training complete.")
 
     def predict(self, df_test):
-        X = df_test.drop(columns=['label', 'alert_id'])
+        X = df_test.drop(columns=['ra', 'dec', 'jd', 'label', 'alert_id'])
         
         self.X_test = self.scaler.transform(X)
         self.y_test = df_test['label'].astype(int)
@@ -183,7 +148,7 @@ class TransientDetector:
     def save_predictions(self, df_test, pred_probs, preds, output_dir='ztf_pipeline_output'):
         os.makedirs(output_dir, exist_ok=True)
         
-        X = df_test.drop(columns=['label', 'alert_id'])
+        X = df_test.drop(columns=['ra', 'dec', 'jd', 'label', 'alert_id'])
         results_df = pd.DataFrame(self.X_test, columns=X.columns).assign(
             label=self.y_test.values,
             pred_prob=pred_probs,
