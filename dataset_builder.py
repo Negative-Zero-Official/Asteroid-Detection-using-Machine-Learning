@@ -5,6 +5,7 @@ from tqdm import tqdm
 import sys
 from astropy.stats import sigma_clipped_stats
 from retrieval import decode_cutout
+from feature_extractor import extract_alert_features
 
 def normalize_image(arr, clip_sigma=5.0, to_range=True):
     finite = arr[np.isfinite(arr)]
@@ -81,26 +82,29 @@ def build_dataset_from_alerts(
         except Exception:
             continue
         
+        fwhm_pixels = a['fwhm'] / 1.01
+        
+        alert_feats = extract_alert_features(
+            sci=sci, ref=ref, diff=diff,
+            fwhm_alert=fwhm_pixels
+        )
+        
         combined_feat = {
             'alert_id' : i,
             'magpsf' : a['magpsf'],
             'sigmapsf' : a['sigmapsf'],
             'fwhm' : a['fwhm'],
             'ndethist' : a['ndethist'],
-            'sgscore' : a['sgscore'],
+            'sgscore1' : a['sgscore1'],
+            'sgscore2' : a['sgscore2'],
+            'sgscore3' : a['sgscore3'],
             'ssdistnr' : a['ssdistnr'],
             'label' : 1 if reality_score >= 0.85 else 0
         }
         
-        for img_type, img in [('sci', sci), ('ref', ref), ('diff', diff)]:
-            if img is not None:
-                feat = extract_features_from_image(img, img_type)
-                if feat is not None:
-                    combined_feat.update(feat)
-        
-        if 'sci_mean' in combined_feat and 'ref_mean' in combined_feat and 'diff_mean' in combined_feat:
-            features.append(combined_feat)
-            count += 1
+        combined_feat.update(alert_feats)
+        features.append(combined_feat)
+        count += 1
         
         if len(features) > batch_size:
             df_feats = pd.DataFrame(features)

@@ -32,7 +32,9 @@ def parse_avro_alerts_from_tar(tar_path, max_alerts):
                 sigmapsf = cand.get('sigmapsf') # Uncertainty in magnitude
                 fwhm = cand.get('fwhm') # Full Width Half Max (shape/width)
                 ndethist = cand.get('ndethist') # Number of prior predictions
-                sgscore = cand.get('sgscore') # Star-Galaxy score
+                sgscore1 = cand.get('sgscore1') # Star-Galaxy score
+                sgscore2 = cand.get('sgscore2')
+                sgscore3 = cand.get('sgscore3')
                 ssdistnr = cand.get('ssdistnr') # Distance to nearest known solar system object
                 
                 final_score = drb_score if drb_score != -1 else rb_score
@@ -53,7 +55,9 @@ def parse_avro_alerts_from_tar(tar_path, max_alerts):
                     'sigmapsf' : sigmapsf,
                     'fwhm' : fwhm,
                     'ndethist' : ndethist,
-                    'sgscore' : sgscore,
+                    'sgscore1' : sgscore1,
+                    'sgscore2' : sgscore2,
+                    'sgscore3' : sgscore3,
                     'ssdistnr' : ssdistnr,
                     'cutoutScience' : cs,
                     'cutoutTemplate' : cr,

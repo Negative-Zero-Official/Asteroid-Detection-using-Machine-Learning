@@ -60,17 +60,35 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
         "min_child_weight" : 3
     }
     
-    start_time = time.time()
-    start_lt = time.localtime(start_time)
-    start_ft = time.strftime("%Y-%m-%d %H:%M:%S", start_lt)
-    print(f"Started model training at: {start_ft}")
+    training_start_time = time.time()
+    training_start_lt = time.localtime(training_start_time)
+    training_start_ft = time.strftime("%Y-%m-%d %H:%M:%S", training_start_lt)
+    print(f"Started model training at: {training_start_ft}")
+    
     bst = xgb.train(params, dtrain, num_boost_round=200, evals=[(dtest, "test")], early_stopping_rounds=10)
-    end_time = time.time()
-    end_lt = time.localtime(end_time)
-    end_ft = time.strftime("%Y-%m-%d %H:%M:%S", end_lt)
-    print(f"Finished model training at: {end_ft}")
-    print(f"Time taken: {end_time - start_time} seconds")
-    preds = (bst.predict(dtest) >= 0.5).astype(int)
+    
+    training_end_time = time.time()
+    training_end_lt = time.localtime(training_end_time)
+    training_end_ft = time.strftime("%Y-%m-%d %H:%M:%S", training_end_lt)
+    print(f"Finished model training at: {training_end_ft}")
+    training_time = training_end_time - training_start_time
+    print(f"Model training time: {training_time} seconds\t\t\t({training_time / len(X_train)} seconds per alert)\t({len(X_train) / training_time} alerts per second)")
+    
+    test_start_time = time.time()
+    test_start_lt = time.localtime(test_start_time)
+    test_start_ft = time.strftime("%Y-%m-%d %H:%M:%S", test_start_lt)
+    print(f"Started model execution/prediction at: {test_start_ft}")
+    
+    probs = bst.predict(dtest)
+    
+    test_end_time = time.time()
+    test_end_lt = time.localtime(test_end_time)
+    test_end_ft = time.strftime("%Y-%m-%d %H:%M:%S", test_end_lt)
+    print(f"Finished model execution/prediction at: {test_end_ft}")
+    execution_time = test_end_time - test_start_time
+    print(f"Model execution time: {execution_time} seconds\t\t({execution_time / len(X_test)} seconds per alert)\t({len(X_test) / execution_time} alerts per second)")
+    
+    preds = (probs >= 0.5).astype(int)
     
     prec, rec, f1, _ = precision_recall_fscore_support(y_test, preds, average="binary", zero_division=0)
     print("Precision: ", prec, "Recall: ", rec, "F1: ", f1)
@@ -86,7 +104,7 @@ def train_and_evaluate(df, output_dir="ztf_pipeline_output"):
     
     bst.save_model(os.path.join(output_dir, "xgb_model.json"))
     joblib.dump(scaler, os.path.join(output_dir, "scaler.pkl"))
-    pd.DataFrame(X_test_s, columns=X.columns).assign(label=y_test.values, pred=preds).to_csv(os.path.join(output_dir, "test_results.csv"))
+    pd.DataFrame(X_test_s, columns=X.columns).assign(label=y_test.values, pred=preds, pred_prob=probs).to_csv(os.path.join(output_dir, "test_results.csv"))
     
     print("Model, scaler, and test results saved.")
 
