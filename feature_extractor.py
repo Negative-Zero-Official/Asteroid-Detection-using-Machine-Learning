@@ -15,11 +15,15 @@ def gaussian_psf(size, sigma, center=None):
     g /= g.sum() + 1e-12
     return g
 
-def robust_bg_stats_local(img, cx, cy, r_in=8, r_out=11):
-    h, w = img.shape
-    y, x = np.mgrid[0:h, 0:w]
-    r = np.sqrt((x - cx)**2 + (y - cy)**2)
-    ring = img[(r >= r_in) & (r <= r_out)]
+def robust_bg_stats_local(img, cx, cy, r_in=8, r_out=11, grids=None):
+    if grids is not None:
+        y, x = grids
+    else:
+        h, w = img.shape
+        y, x = np.mgrid[0:h, 0:w]
+    r_sq = (x - cx)**2 + (y - cy)**2
+    mask = (r_sq >= r_in**2) & (r_sq <= r_out**2)
+    ring = img[mask]
     if ring.size < 25:
         ring = img.ravel()
     med = np.median(ring)
@@ -27,30 +31,39 @@ def robust_bg_stats_local(img, cx, cy, r_in=8, r_out=11):
     rms = 1.4826 * mad if mad > 0 else np.std(ring)
     return med, rms
 
-def first_second_moments_nonneg(img):
+def first_second_moments_nonneg(img, grids=None):
     I = img - np.min(img)
-    I[I < 0] = 0
-    if I.sum() <= 0:
-        h,w = I.shape
-        return ((w-1)/2.0, (h-1)/2.0), (1.0, 1.0, 1.0)
-    y, x = np.mgrid[0:I.shape[0], 0:I.shape[1]]
+    I = np.maximum(I, 0)
     S = I.sum()
-    xbar = (I * x).sum() / S
-    ybar = (I * y).sum() / S
-    xx = (I * (x - xbar)**2).sum() / S
-    yy = (I * (y - ybar)**2).sum() / S
-    xy = (I * (x - xbar)*(y - ybar)).sum() / S
+    if S <= 0:
+        h, w = I.shape
+        return ((w-1)/2.0, (h-1)/2.0), (1.0, 1.0, 1.0)
+    if grids is not None:
+        y, x = grids
+    else:
+        y, x = np.mgrid[0:I.shape[0], 0:I.shape[1]]
+    inv_S = 1.0 / S
+    xbar = (I * x).sum() * inv_S
+    ybar = (I * y).sum() * inv_S
+    dx = x - xbar
+    dy = y - ybar
+    xx = (I * dx * dx).sum() * inv_S
+    yy = (I * dy * dy).sum() * inv_S
+    xy = (I * dx * dy).sum() * inv_S
     return (xbar, ybar), (xx, yy, xy)
 
-def aperture_fluxes(img, radii, center):
-    h, w = img.shape
-    y, x = np.mgrid[0:h, 0:w]
-    cx, cy, = center
-    r = np.sqrt((x - cx)**2 + (y - cy)**2)
-    sums = []
-    for rad in radii:
-        sums.append(img[r <= rad].sum())
-    return np.array(sums)
+def aperture_fluxes(img, radii, center, grids=None):
+    if grids is not None:
+        y, x = grids
+    else:
+        h, w = img.shape
+        y, x = np.mgrid[0:h, 0:w]
+    cx, cy = center
+    r_sq = (x - cx)**2 + (y - cy)**2
+    # Vectorized aperture flux computation
+    radii_sq = np.array(radii) ** 2
+    sums = np.array([img[r_sq <= r2].sum() for r2 in radii_sq])
+    return sums
 
 # Main Extractor for one alert
 
@@ -64,23 +77,25 @@ def extract_alert_features(
     feats = {}
     H, W = diff.shape
 
-    cx0, cy0 = (W - 1) / 2.0, (H - 1) / 2.0
+    # Precompute grids once for all operations
+    y_grid, x_grid = np.mgrid[0:H, 0:W]
+    grids = (y_grid, x_grid)
+    cx0, cy0 = (W - 1) * 0.5, (H - 1) * 0.5
     
     # Background on difference (local)
-    bg_mean, bg_rms = robust_bg_stats_local(diff, cx0, cy0)
+    bg_mean, bg_rms = robust_bg_stats_local(diff, cx0, cy0, grids=grids)
     feats['diff_bg_mean'] = float(bg_mean)
     feats['diff_bg_rms'] = float(bg_rms)
     
-    clipped_diff = np.clip(diff - bg_mean, 0, None)
+    clipped_diff = np.maximum(diff - bg_mean, 0)
     
     # Pick PSF sigma
     if fwhm_alert is not None and fwhm_alert > 0:
-        psf_sigma = float(fwhm_alert) / 2.355
+        psf_sigma = fwhm_alert * 0.42466090014400953  # 1/2.355
     else:
-        # quick estimate from second moments of positive clip
-        (cx_tmp, cy_temp), (xx, yy, _) = first_second_moments_nonneg(clipped_diff)
-        psf_sigma = float(np.sqrt(np.sqrt(xx * yy)) + 1e-6)
-    psf_size = int(max(15, 6 * psf_sigma)) | 1 # odd size
+        (cx_tmp, cy_temp), (xx, yy, _) = first_second_moments_nonneg(clipped_diff, grids=grids)
+        psf_sigma = np.sqrt(np.sqrt(xx * yy)) + 1e-6
+    psf_size = int(max(15, 6 * psf_sigma)) | 1
     psf = gaussian_psf(psf_size, psf_sigma)
     
     # Matched filter on diff
@@ -98,14 +113,15 @@ def extract_alert_features(
     })
     
     # Second-moment shape on positive clip of diff
-    (cx, cy), (xx, yy, xy) = first_second_moments_nonneg(clipped_diff)
-    # FIX: correct covariance construction
-    cov = np.array([[xx, xy], [xy, yy]]) + 1e-12*np.eye(2)
-    evals, _ = np.linalg.eigh(cov)
-    a, b = np.sqrt(np.maximum(evals, 1e-12)) # sigma major/minor
-    elong = (a + 1e-6) / (b + 1e-6)
+    (cx, cy), (xx, yy, xy) = first_second_moments_nonneg(clipped_diff, grids=grids)
+    cov = np.array([[xx + 1e-12, xy], [xy, yy + 1e-12]])
+    evals = np.linalg.eigvalsh(cov)
+    evals = np.maximum(evals, 1e-12)
+    a, b = np.sqrt(evals)
+    inv_b = 1.0 / (b + 1e-6)
+    elong = (a + 1e-6) * inv_b
     roundness = 1.0 - b / a
-    fwhm_mom = 2.3548 * float(np.sqrt(np.sqrt(xx * yy)))
+    fwhm_mom = 2.3548 * np.sqrt(np.sqrt(xx * yy))
     
     feats.update({
         'centroid_x' : float(cx),
@@ -119,13 +135,14 @@ def extract_alert_features(
     })
     
     # Sharpness / Concentration
-    ap_flux = aperture_fluxes(clipped_diff, apertures, (cx, cy))
+    ap_flux = aperture_fluxes(clipped_diff, apertures, (cx, cy), grids=grids)
+    ap0, ap1, ap2 = ap_flux[0], ap_flux[1], ap_flux[2]
     feats.update({
-        'ap_r1' : float(ap_flux[0]),
-        'ap_r2' : float(ap_flux[1]),
-        'ap_r3' : float(ap_flux[2]),
-        'conc_r1_r2' : float((ap_flux[0] + 1e-9) / (ap_flux[1] + 1e-9)),
-        'conc_r2_r3' : float((ap_flux[1] + 1e-9) / (ap_flux[2] + 1e-9))
+        'ap_r1' : float(ap0),
+        'ap_r2' : float(ap1),
+        'ap_r3' : float(ap2),
+        'conc_r1_r2' : float((ap0 + 1e-9) / (ap1 + 1e-9)),
+        'conc_r2_r3' : float((ap1 + 1e-9) / (ap2 + 1e-9))
     })
     
     # Positive/Negative lobe symmetry (dipole rejection)
@@ -138,32 +155,22 @@ def extract_alert_features(
     })
     
     # PSF fit amplitude and chi^2 on diff
-    # # Fit A * PSF(cx, cy) + C with center fixed at (cx, cy)
-    # psf_grid = gaussian_psf(H if H%2==1 else H-1, psf_sigma, center=(cx, cy))
-    # Build PSF on the same HxW grid to avoid crop/pad issues
-    y, x = np.mgrid[0:H, 0:W]
-    # Center at (cy, cx) in (y,x) coordinates
-    pg = np.exp(-(((x - cx)**2 + (y - cy)**2) / (2.0 * psf_sigma**2)))
-    pg /= pg.sum() + 1e-12
-    # Ensure finite
+    inv_2sigma_sq = 1.0 / (2.0 * psf_sigma**2)
+    pg = np.exp(-(((x_grid - cx)**2 + (y_grid - cy)**2) * inv_2sigma_sq))
+    pg *= 1.0 / (pg.sum() + 1e-12)
     pg = np.nan_to_num(pg, nan=0.0, posinf=0.0, neginf=0.0)
-        
+    
     data = diff
     w = 1.0 / (bg_rms + 1e-6)
     
     def resid(params):
         A, C = params
         r = (w * (data - (A * pg + C))).ravel()
-        # Guard against non-finite values
         return np.nan_to_num(r, nan=1e6, posinf=1e6, neginf=-1e6)
     
     # Robust initial guess for A
-    A0 = ap_flux[-1]
-    if not np.isfinite(A0):
-        # fallback to matched-filter flux estimate at peak
-        A0 = peak_val
-    C0 = 0.0
-    res = least_squares(resid, x0=[float(A0), float(C0)], max_nfev=200)
+    A0 = ap2 if np.isfinite(ap2) else peak_val
+    res = least_squares(resid, x0=[float(A0), 0.0], max_nfev=200)
     A, C = res.x
     chi2 = float(np.sum(resid(res.x)**2))
     dof = max(1, data.size - 2)
@@ -186,21 +193,19 @@ def extract_alert_features(
     })
     
     # Local Crowding
-    ring = diff.copy()
-    y, x = np.mgrid[0:H, 0:W]
-    r = np.sqrt((x - cx)**2 + (y - cy)**2)
-    ring[r <= 4.5] = bg_mean
-    k = 5.0
-    feats['crowding_ngt5sigma'] = int((ring > (bg_mean + k*bg_rms)).sum())
+    r_sq = (x_grid - cx)**2 + (y_grid - cy)**2
+    mask_outer = r_sq > 20.25  # 4.5^2
+    threshold = bg_mean + 5.0 * bg_rms
+    feats['crowding_ngt5sigma'] = int(np.sum((diff > threshold) & mask_outer))
     
     # Cross-Image Consistency
     def centroid_and_rflux(img):
         if img is None:
             return (np.nan, np.nan), np.nan
-        
-        m, _ = robust_bg_stats_local(img, cx, cy)
-        (cxx, cyy), _ = first_second_moments_nonneg(np.clip(img - m, 0, None))
-        f = aperture_fluxes(np.clip(img - m, 0, None), apertures, (cxx, cyy))[-1]
+        m, _ = robust_bg_stats_local(img, cx, cy, grids=grids)
+        img_clip = np.maximum(img - m, 0)
+        (cxx, cyy), _ = first_second_moments_nonneg(img_clip, grids=grids)
+        f = aperture_fluxes(img_clip, apertures, (cxx, cyy), grids=grids)[-1]
         return (cxx, cyy), f
     
     (csx, csy), sci_r3 = centroid_and_rflux(sci)
@@ -220,7 +225,6 @@ def extract_alert_features(
     for s in multiscale_sigmas:
         g1 = ndi.gaussian_filter(diff, s)
         g2 = ndi.gaussian_filter(diff, 2.0 * s)
-        band = g1 - g2
-        feats[f'DoG_energy_sigma_{s:.1f}'] = float(np.sum(np.abs(band)))
+        feats[f'DoG_energy_sigma_{s:.1f}'] = float(np.sum(np.abs(g1 - g2)))
     
     return feats
