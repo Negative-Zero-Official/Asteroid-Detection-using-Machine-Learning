@@ -3,48 +3,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import sys
-from astropy.stats import sigma_clipped_stats
 from retrieval import decode_cutout
 from feature_extractor import extract_alert_features
-
-def normalize_image(arr, clip_sigma=5.0, to_range=True):
-    finite = arr[np.isfinite(arr)]
-    median_f, max_f, min_f = 0.0, 0.0, 0.0
-    if finite.size:
-        median_f = np.median(finite)
-        max_f = np.max(finite)
-        min_f = np.min(finite)
-    
-    arr = np.nan_to_num(arr, nan=median_f, posinf=max_f, neginf=min_f).astype(np.float32)
-    
-    _, median, std = sigma_clipped_stats(arr, sigma=5.0, maxiters=5)
-    bg = median
-    scale = std if (std is not None and std > 1e-6) else 1.0
-    
-    norm = (arr - bg) / scale
-    norm = np.clip(norm, -clip_sigma, clip_sigma)
-    
-    if to_range:
-        norm = (norm + clip_sigma) / (2 * clip_sigma)
-    
-    return norm
-
-def extract_features_from_image(image, img_type='sci'):
-    if image is None:
-        return None
-    
-    arr = np.asarray(image, dtype=np.float32)
-    
-    norm = normalize_image(arr, clip_sigma=5.0, to_range=True)
-    
-    feats = {
-        img_type + '_mean' : float(np.mean(norm)),
-        img_type + '_std' : float(np.std(norm)),
-        img_type + '_max' : float(np.max(norm)),
-        img_type + '_min' : float(np.min(norm))
-    }
-    
-    return feats
 
 def build_dataset_from_alerts(
     alerts,
@@ -63,9 +23,6 @@ def build_dataset_from_alerts(
             break
 
         reality_score = a['drb']
-        
-        # if 0.3 <= reality_score <= 0.7:
-        #     continue
         
         try:
             sci = decode_cutout(a['cutoutScience'])

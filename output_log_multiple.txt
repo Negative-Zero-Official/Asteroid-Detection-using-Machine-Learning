@@ -6,7 +6,9 @@ Dataset complete: 299009 samples saved in ztf_pipeline_output_multiple\batches\t
 Loading training batches...
 Total training dataset size: 299009 samples.
 Spawning Transient Detector model and fitting data...
-Model training complete.
+Started model training at: 2025-12-02 03:10:23
+Finished model training at: 2025-12-02 03:10:24
+Model training time: 0.9859151840209961 seconds                                (3.2972759482858247e-06 seconds per alert)                                (303280.6521758897 alerts per second)
 Processing tar file: tarballs\ztf_public_20250302.tar.gz
 Loaded 38368 from tarballs\ztf_public_20250302.tar.gz (testing).
 Starting dataset building... (000)
@@ -26,17 +28,20 @@ Testing each training dataset separately...
 Loading dataset for TAR tarballs\ztf_public_20250302.tar.gz...
 Test dataset size for tarballs\ztf_public_20250302.tar.gz: 38368 samples.
 Running predictions for TAR tarballs\ztf_public_20250302.tar.gz...
+Started model execution/prediction at: 2025-12-02 03:30:22
+Finished model execution/prediction at: 2025-12-02 03:30:22
+Model execution time: 0.05447745323181152 seconds                                (1.419866900328699e-06 seconds per alert)                                (704291.3668657958 alerts per second)
 Predictions complete.
 Evaluating model for TAR tarballs\ztf_public_20250302.tar.gz...
-Precision: 0.9423617448439496	Recall: 0.9051576031695944	F1 Score: 0.9233850776164246	Support: None
+Precision: 0.9414831981460023	Recall: 0.9116089898671155	F1 Score: 0.9263052888469281
               precision    recall  f1-score   support
 
-           0       0.75      0.84      0.79      9847
-           1       0.94      0.91      0.92     28521
+           0       0.77      0.84      0.80      9847
+           1       0.94      0.91      0.93     28521
 
     accuracy                           0.89     38368
    macro avg       0.85      0.87      0.86     38368
-weighted avg       0.89      0.89      0.89     38368
+weighted avg       0.90      0.89      0.89     38368
 
 Saved Confusion Matrix image.
 Saving predictions for TAR tarballs\ztf_public_20250302.tar.gz...
@@ -44,16 +49,19 @@ Test results saved.
 Loading dataset for TAR tarballs\ztf_public_20250819.tar.gz...
 Test dataset size for tarballs\ztf_public_20250819.tar.gz: 9773 samples.
 Running predictions for TAR tarballs\ztf_public_20250819.tar.gz...
+Started model execution/prediction at: 2025-12-02 03:30:24
+Finished model execution/prediction at: 2025-12-02 03:30:24
+Model execution time: 0.011322975158691406 seconds                                (1.1585976832795873e-06 seconds per alert)                                (863112.3766529099 alerts per second)
 Predictions complete.
 Evaluating model for TAR tarballs\ztf_public_20250819.tar.gz...
-Precision: 0.9474946695095949	Recall: 0.9110712455151204	F1 Score: 0.9289260517376535	Support: None
+Precision: 0.9547615813068876	Recall: 0.9005638134290108	F1 Score: 0.9268710847345862
               precision    recall  f1-score   support
 
-           0       0.69      0.80      0.74      1969
-           1       0.95      0.91      0.93      7804
+           0       0.68      0.83      0.75      1969
+           1       0.95      0.90      0.93      7804
 
     accuracy                           0.89      9773
-   macro avg       0.82      0.86      0.84      9773
+   macro avg       0.82      0.87      0.84      9773
 weighted avg       0.90      0.89      0.89      9773
 
 Saved Confusion Matrix image.
@@ -62,17 +70,20 @@ Test results saved.
 Loading dataset for TAR tarballs\ztf_public_20251102.tar.gz...
 Test dataset size for tarballs\ztf_public_20251102.tar.gz: 177421 samples.
 Running predictions for TAR tarballs\ztf_public_20251102.tar.gz...
+Started model execution/prediction at: 2025-12-02 03:30:30
+Finished model execution/prediction at: 2025-12-02 03:30:30
+Model execution time: 0.057642221450805664 seconds                                (3.2488950829273687e-07 seconds per alert)                                (3077969.508017984 alerts per second)
 Predictions complete.
 Evaluating model for TAR tarballs\ztf_public_20251102.tar.gz...
-Precision: 0.9374433290155441	Recall: 0.8914216648575409	F1 Score: 0.9138534510313041	Support: None
+Precision: 0.935648530863504	Recall: 0.8974726129163876	F1 Score: 0.9161630529599912
               precision    recall  f1-score   support
 
-           0       0.74      0.84      0.78     47524
-           1       0.94      0.89      0.91    129897
+           0       0.75      0.83      0.79     47524
+           1       0.94      0.90      0.92    129897
 
     accuracy                           0.88    177421
    macro avg       0.84      0.86      0.85    177421
-weighted avg       0.88      0.88      0.88    177421
+weighted avg       0.89      0.88      0.88    177421
 
 Saved Confusion Matrix image.
 Saving predictions for TAR tarballs\ztf_public_20251102.tar.gz...

@@ -17,7 +17,12 @@ for a in alerts:
     if sci_dec is None:
         # nothing to display for this alert
         continue
-
+    
+    for key, item in a.items():
+        if key not in ['cutoutScience', 'cutoutTemplate', 'cutoutDifference']:
+            print(f"{key+":":<15} {a[key]}")
+    print("\n\n")
+    
     if ref_dec is not None:
         fig, axes = plt.subplots(1, 3, figsize=(12, 4))
         axes[0].imshow(sci_dec, cmap='gray')
