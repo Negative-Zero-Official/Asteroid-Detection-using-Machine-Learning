@@ -1095,11 +1095,11 @@ If you use this code in your research, please cite:
 
 ```bibtex
 @software{asteroid_detection_ml,
-  author = {Prahlad Gaitonde},
-  title = {Asteroid Detection Using Machine Learning},
+  author = {Prahlad Gaitonde, Kumar Satyam},
+  title = {Transient Detection Using Machine Learning},
   year = {2025},
   publisher = {GitHub},
-  url = {https://github.com/Negative-Zero-Official/Asteroid-Detection-using-Machine-Learning}
+  url = {https://github.com/Negative-Zero-Official/Transient-Detection-using-Machine-Learning}
 }
 ```
 
